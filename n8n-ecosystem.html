@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>n8n Ecosystem</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body {
+    width: 100%; height: 100%;
+    background: #1E1A17;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+  }
+  svg {
+    width: 100vw;
+    height: 100vh;
+    display: block;
+  }
+
+  @keyframes glow-line {
+    0%,100% { stroke-opacity: 0.12; }
+    50%      { stroke-opacity: 0.65; }
+  }
+  .p1 { stroke: #EA6A47; animation: glow-line 2.8s ease-in-out infinite 0s;    }
+  .p2 { stroke: #EA6A47; animation: glow-line 2.8s ease-in-out infinite 0.47s; }
+  .p3 { stroke: #EA6A47; animation: glow-line 2.8s ease-in-out infinite 0.93s; }
+  .p4 { stroke: #EA6A47; animation: glow-line 2.8s ease-in-out infinite 1.40s; }
+  .p5 { stroke: #EA6A47; animation: glow-line 2.8s ease-in-out infinite 1.87s; }
+  .p6 { stroke: #EA6A47; animation: glow-line 2.8s ease-in-out infinite 2.33s; }
+
+  @keyframes ring-pulse {
+    0%   { r: 72;  opacity: 0.55; }
+    100% { r: 115; opacity: 0;    }
+  }
+  .ring1 { animation: ring-pulse 3.2s ease-out infinite 0s;   }
+  .ring2 { animation: ring-pulse 3.2s ease-out infinite 1.2s; }
+  .ring3 { animation: ring-pulse 3.2s ease-out infinite 2.4s; }
+
+  .node-group { cursor: default; }
+  .node-group:hover .node-rect {
+    filter: brightness(1.2);
+    transition: filter 0.25s ease;
+  }
+  .node-rect { transition: filter 0.25s ease; }
+</style>
+</head>
+<body>
+<svg viewBox="0 0 1000 700" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <!-- Paths: from node edge midpoint → core centre (500, 350) -->
+    <!-- Trigger  right-edge x=290, mid-y=205 -->
+    <path id="pt" d="M 290 205 C 370 240, 440 300, 500 350"/>
+    <!-- HTTP     left-edge x=710, mid-y=205 -->
+    <path id="ph" d="M 710 205 C 630 240, 560 300, 500 350"/>
+    <!-- AI       right-edge x=290, mid-y=350 -->
+    <path id="pa" d="M 290 350 C 365 350, 430 350, 500 350"/>
+    <!-- DB       left-edge x=710, mid-y=350 -->
+    <path id="pd" d="M 710 350 C 635 350, 570 350, 500 350"/>
+    <!-- Slack    right-edge x=290, mid-y=495 -->
+    <path id="ps" d="M 290 495 C 370 460, 440 400, 500 350"/>
+    <!-- Email    left-edge x=710, mid-y=495 -->
+    <path id="pe" d="M 710 495 C 630 460, 560 400, 500 350"/>
+
+    <!-- Ball glow -->
+    <filter id="glow" x="-100%" y="-100%" width="300%" height="300%">
+      <feGaussianBlur stdDeviation="5" result="b"/>
+      <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <!-- Core glow -->
+    <filter id="core-glow" x="-60%" y="-60%" width="220%" height="220%">
+      <feGaussianBlur stdDeviation="12" result="b"/>
+      <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <!-- Card glow -->
+    <filter id="card-glow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="6" result="b"/>
+      <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1000" height="700" fill="#1E1A17"/>
+
+  <!-- Subtle warm dot grain -->
+  <pattern id="grain" x="0" y="0" width="28" height="28" patternUnits="userSpaceOnUse">
+    <circle cx="1" cy="1" r="0.75" fill="rgba(245,239,224,0.035)"/>
+  </pattern>
+  <rect width="1000" height="700" fill="url(#grain)"/>
+
+  <!-- Connector lines -->
+  <use href="#pt" class="p1" fill="none" stroke-width="1.8" stroke-linecap="round"/>
+  <use href="#ph" class="p2" fill="none" stroke-width="1.8" stroke-linecap="round"/>
+  <use href="#pa" class="p3" fill="none" stroke-width="1.8" stroke-linecap="round"/>
+  <use href="#pd" class="p4" fill="none" stroke-width="1.8" stroke-linecap="round"/>
+  <use href="#ps" class="p5" fill="none" stroke-width="1.8" stroke-linecap="round"/>
+  <use href="#pe" class="p6" fill="none" stroke-width="1.8" stroke-linecap="round"/>
+
+  <!-- Core engine -->
+  <circle class="ring1" cx="500" cy="350" r="72" fill="none" stroke="rgba(234,106,71,0.22)" stroke-width="1"/>
+  <circle class="ring2" cx="500" cy="350" r="72" fill="none" stroke="rgba(234,106,71,0.16)" stroke-width="1"/>
+  <circle class="ring3" cx="500" cy="350" r="72" fill="none" stroke="rgba(234,106,71,0.10)" stroke-width="1"/>
+  <circle cx="500" cy="350" r="64" fill="rgba(234,106,71,0.09)" stroke="rgba(234,106,71,0.5)" stroke-width="1.2" filter="url(#core-glow)"/>
+  <circle cx="500" cy="350" r="48" fill="rgba(234,106,71,0.06)" stroke="rgba(234,106,71,0.25)" stroke-width="0.8"/>
+  <circle cx="500" cy="350" r="30" fill="rgba(234,106,71,0.1)" stroke="none"/>
+  <text x="500" y="344" text-anchor="middle"
+        font-family="'DM Sans',sans-serif" font-weight="600" font-size="26"
+        fill="#F5EFE0">n8n</text>
+  <text x="500" y="364" text-anchor="middle"
+        font-family="'DM Mono',monospace" font-size="9"
+        fill="rgba(234,106,71,0.8)" letter-spacing="0.2em">CORE</text>
+
+  <!-- ── NODE CARDS ── -->
+  <!-- Width=280 Height=90  Coral left bar 5px -->
+  <!-- Trigger: x=10, y=160, centre-right=(290,205) -->
+  <g class="node-group">
+    <rect class="node-rect" x="10" y="160" width="280" height="90" rx="12"
+          fill="#251F1B" stroke="rgba(234,106,71,0.38)" stroke-width="1"
+          filter="url(#card-glow)"/>
+    <rect x="10" y="160" width="5" height="90" rx="2" fill="#EA6A47" opacity="0.85"/>
+    <text x="32" y="198" font-family="'DM Sans',sans-serif" font-weight="600"
+          font-size="15" fill="#F5EFE0">Trigger node</text>
+    <text x="32" y="222" font-family="'DM Mono',monospace" font-size="11"
+          fill="rgba(245,239,224,0.42)">Webhook · Schedule · Events</text>
+  </g>
+
+  <!-- HTTP: x=710, y=160, centre-left=(710,205) -->
+  <g class="node-group">
+    <rect class="node-rect" x="710" y="160" width="280" height="90" rx="12"
+          fill="#251F1B" stroke="rgba(234,106,71,0.38)" stroke-width="1"
+          filter="url(#card-glow)"/>
+    <rect x="985" y="160" width="5" height="90" rx="2" fill="#EA6A47" opacity="0.85"/>
+    <text x="730" y="198" font-family="'DM Sans',sans-serif" font-weight="600"
+          font-size="15" fill="#F5EFE0">HTTP request node</text>
+    <text x="730" y="222" font-family="'DM Mono',monospace" font-size="11"
+          fill="rgba(245,239,224,0.42)">API calls · JSON · XML</text>
+  </g>
+
+  <!-- AI Agent: x=10, y=305, centre-right=(290,350) -->
+  <g class="node-group">
+    <rect class="node-rect" x="10" y="305" width="280" height="90" rx="12"
+          fill="#251F1B" stroke="rgba(234,106,71,0.38)" stroke-width="1"
+          filter="url(#card-glow)"/>
+    <rect x="10" y="305" width="5" height="90" rx="2" fill="#EA6A47" opacity="0.85"/>
+    <text x="32" y="343" font-family="'DM Sans',sans-serif" font-weight="600"
+          font-size="15" fill="#F5EFE0">AI agent node</text>
+    <text x="32" y="367" font-family="'DM Mono',monospace" font-size="11"
+          fill="rgba(245,239,224,0.42)">OpenAI · Claude · LangChain</text>
+  </g>
+
+  <!-- Database: x=710, y=305, centre-left=(710,350) -->
+  <g class="node-group">
+    <rect class="node-rect" x="710" y="305" width="280" height="90" rx="12"
+          fill="#251F1B" stroke="rgba(234,106,71,0.38)" stroke-width="1"
+          filter="url(#card-glow)"/>
+    <rect x="985" y="305" width="5" height="90" rx="2" fill="#EA6A47" opacity="0.85"/>
+    <text x="730" y="343" font-family="'DM Sans',sans-serif" font-weight="600"
+          font-size="15" fill="#F5EFE0">Database node</text>
+    <text x="730" y="367" font-family="'DM Mono',monospace" font-size="11"
+          fill="rgba(245,239,224,0.42)">PostgreSQL · MySQL · Records</text>
+  </g>
+
+  <!-- Slack: x=10, y=450, centre-right=(290,495) -->
+  <g class="node-group">
+    <rect class="node-rect" x="10" y="450" width="280" height="90" rx="12"
+          fill="#251F1B" stroke="rgba(234,106,71,0.38)" stroke-width="1"
+          filter="url(#card-glow)"/>
+    <rect x="10" y="450" width="5" height="90" rx="2" fill="#EA6A47" opacity="0.85"/>
+    <text x="32" y="488" font-family="'DM Sans',sans-serif" font-weight="600"
+          font-size="15" fill="#F5EFE0">Slack node</text>
+    <text x="32" y="512" font-family="'DM Mono',monospace" font-size="11"
+          fill="rgba(245,239,224,0.42)">Messages · Alerts · Bots</text>
+  </g>
+
+  <!-- Email: x=710, y=450, centre-left=(710,495) -->
+  <g class="node-group">
+    <rect class="node-rect" x="710" y="450" width="280" height="90" rx="12"
+          fill="#251F1B" stroke="rgba(234,106,71,0.38)" stroke-width="1"
+          filter="url(#card-glow)"/>
+    <rect x="985" y="450" width="5" height="90" rx="2" fill="#EA6A47" opacity="0.85"/>
+    <text x="730" y="488" font-family="'DM Sans',sans-serif" font-weight="600"
+          font-size="15" fill="#F5EFE0">Email node</text>
+    <text x="730" y="512" font-family="'DM Mono',monospace" font-size="11"
+          fill="rgba(245,239,224,0.42)">SMTP · Gmail · Newsletters</text>
+  </g>
+
+  <!-- ── Travelling balls ── -->
+  <circle r="6" fill="#EA6A47" filter="url(#glow)">
+    <animateMotion dur="2.8s" repeatCount="indefinite" begin="0s"><mpath href="#pt"/></animateMotion>
+    <animate attributeName="opacity" values="0;0;1;1;0" keyTimes="0;0.04;0.12;0.88;1" dur="2.8s" repeatCount="indefinite" begin="0s"/>
+  </circle>
+
+  <circle r="6" fill="#EA6A47" filter="url(#glow)">
+    <animateMotion dur="2.8s" repeatCount="indefinite" begin="0.47s"><mpath href="#ph"/></animateMotion>
+    <animate attributeName="opacity" values="0;0;1;1;0" keyTimes="0;0.04;0.12;0.88;1" dur="2.8s" repeatCount="indefinite" begin="0.47s"/>
+  </circle>
+
+  <circle r="6" fill="#EA6A47" filter="url(#glow)">
+    <animateMotion dur="2.8s" repeatCount="indefinite" begin="0.93s"><mpath href="#pa"/></animateMotion>
+    <animate attributeName="opacity" values="0;0;1;1;0" keyTimes="0;0.04;0.12;0.88;1" dur="2.8s" repeatCount="indefinite" begin="0.93s"/>
+  </circle>
+
+  <circle r="6" fill="#EA6A47" filter="url(#glow)">
+    <animateMotion dur="2.8s" repeatCount="indefinite" begin="1.40s"><mpath href="#pd"/></animateMotion>
+    <animate attributeName="opacity" values="0;0;1;1;0" keyTimes="0;0.04;0.12;0.88;1" dur="2.8s" repeatCount="indefinite" begin="1.40s"/>
+  </circle>
+
+  <circle r="6" fill="#EA6A47" filter="url(#glow)">
+    <animateMotion dur="2.8s" repeatCount="indefinite" begin="1.87s"><mpath href="#ps"/></animateMotion>
+    <animate attributeName="opacity" values="0;0;1;1;0" keyTimes="0;0.04;0.12;0.88;1" dur="2.8s" repeatCount="indefinite" begin="1.87s"/>
+  </circle>
+
+  <circle r="6" fill="#EA6A47" filter="url(#glow)">
+    <animateMotion dur="2.8s" repeatCount="indefinite" begin="2.33s"><mpath href="#pe"/></animateMotion>
+    <animate attributeName="opacity" values="0;0;1;1;0" keyTimes="0;0.04;0.12;0.88;1" dur="2.8s" repeatCount="indefinite" begin="2.33s"/>
+  </circle>
+
+</svg>
+</body>
+</html>
