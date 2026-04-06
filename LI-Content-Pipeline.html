@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>LinkedIn Content Pipeline — Soch</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet"/>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { width: 100%; height: 100%; background: #1a1a2e; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+  svg { width: 100vw; height: 100vh; max-width: 1200px; max-height: 680px; }
+  @keyframes title-in {
+    from { opacity: 0; transform: translateY(-6px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  .title-g { animation: title-in 1s ease-out forwards; }
+</style>
+</head>
+<body>
+<svg viewBox="0 0 1200 680" xmlns="http://www.w3.org/2000/svg">
+<defs>
+  <pattern id="grid-dots" x="0" y="0" width="28" height="28" patternUnits="userSpaceOnUse">
+    <circle cx="14" cy="14" r="1" fill="rgba(255,255,255,0.055)"/>
+  </pattern>
+  <radialGradient id="vignette" cx="50%" cy="50%" r="70%">
+    <stop offset="0%" stop-color="transparent"/>
+    <stop offset="100%" stop-color="rgba(0,0,0,0.5)"/>
+  </radialGradient>
+  <filter id="glow-soft" x="-30%" y="-30%" width="160%" height="160%">
+    <feGaussianBlur stdDeviation="3" result="blur"/>
+    <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+  </filter>
+  <filter id="shadow" x="-10%" y="-10%" width="120%" height="130%">
+    <feDropShadow dx="0" dy="4" stdDeviation="8" flood-color="#000" flood-opacity="0.5"/>
+  </filter>
+
+  <!-- CONNECTOR PATHS -->
+  <!-- N0(110,310) → N1(300,310) -->
+  <path id="c01" d="M 172,310 L 238,310"/>
+  <!-- N1(300,310) → N2(490,310) -->
+  <path id="c12" d="M 362,310 L 428,310"/>
+  <!-- N2(490,310) → N3(680,310) -->
+  <path id="c23" d="M 552,310 L 618,310"/>
+  <!-- N3(680,310) → N4(900,185) APPROVED branch up -->
+  <path id="c34a" d="M 742,310 C 790,310 810,185 838,185"/>
+  <!-- N4(900,185) → N5(1090,185) -->
+  <path id="c45" d="M 962,185 L 1028,185"/>
+  <!-- N3(680,310) → N6(900,435) REJECTED branch down -->
+  <path id="c36r" d="M 742,310 C 790,310 810,435 838,435"/>
+</defs>
+
+<!-- BACKGROUND -->
+<rect width="1200" height="680" fill="#1a1a2e"/>
+<rect width="1200" height="680" fill="url(#grid-dots)"/>
+<rect width="1200" height="680" fill="url(#vignette)"/>
+
+<!-- TITLE -->
+<g class="title-g">
+  <text x="600" y="46" text-anchor="middle"
+    font-family="'Space Grotesk',sans-serif" font-size="19" font-weight="700"
+    fill="#F5EFE0" letter-spacing="1">LINKEDIN CONTENT PIPELINE</text>
+  <text x="600" y="66" text-anchor="middle"
+    font-family="'DM Sans',sans-serif" font-size="10.5"
+    fill="rgba(245,239,224,0.38)" letter-spacing="3">BRIEF → AI DRAFT → REVIEW → PUBLISH — AUTOMATICALLY</text>
+</g>
+
+<!-- ═══ CONNECTORS + BALLS ═══ -->
+
+<!-- c01: coral -->
+<use href="#c01" fill="none" stroke="rgba(255,255,255,0.12)" stroke-width="2"/>
+<use href="#c01" fill="none" stroke="#EA6A47" stroke-width="1.5">
+  <animate attributeName="stroke-opacity" values="0;0.55;0" dur="1.8s" begin="0.5s" repeatCount="indefinite"/>
+</use>
+<circle r="6" fill="#EA6A47" filter="url(#glow-soft)">
+  <animateMotion dur="0.7s" begin="1.0s" repeatCount="indefinite" calcMode="linear"><mpath href="#c01"/></animateMotion>
+</circle>
+<circle r="3" fill="rgba(255,255,255,0.7)">
+  <animateMotion dur="0.7s" begin="1.05s" repeatCount="indefinite" calcMode="linear"><mpath href="#c01"/></animateMotion>
+</circle>
+
+<!-- c12: teal -->
+<use href="#c12" fill="none" stroke="rgba(255,255,255,0.12)" stroke-width="2"/>
+<use href="#c12" fill="none" stroke="#2db8b0" stroke-width="1.5">
+  <animate attributeName="stroke-opacity" values="0;0.55;0" dur="1.8s" begin="1.5s" repeatCount="indefinite"/>
+</use>
+<circle r="6" fill="#2db8b0" filter="url(#glow-soft)">
+  <animateMotion dur="0.7s" begin="2.0s" repeatCount="indefinite" calcMode="linear"><mpath href="#c12"/></animateMotion>
+</circle>
+<circle r="3" fill="rgba(255,255,255,0.7)">
+  <animateMotion dur="0.7s" begin="2.05s" repeatCount="indefinite" calcMode="linear"><mpath href="#c12"/></animateMotion>
+</circle>
+
+<!-- c23: amber -->
+<use href="#c23" fill="none" stroke="rgba(255,255,255,0.12)" stroke-width="2"/>
+<use href="#c23" fill="none" stroke="#e8a838" stroke-width="1.5">
+  <animate attributeName="stroke-opacity" values="0;0.55;0" dur="1.8s" begin="2.5s" repeatCount="indefinite"/>
+</use>
+<circle r="6" fill="#e8a838" filter="url(#glow-soft)">
+  <animateMotion dur="0.7s" begin="3.0s" repeatCount="indefinite" calcMode="linear"><mpath href="#c23"/></animateMotion>
+</circle>
+<circle r="3" fill="rgba(255,255,255,0.7)">
+  <animateMotion dur="0.7s" begin="3.05s" repeatCount="indefinite" calcMode="linear"><mpath href="#c23"/></animateMotion>
+</circle>
+
+<!-- c34a: green (approved branch up) -->
+<use href="#c34a" fill="none" stroke="rgba(255,255,255,0.12)" stroke-width="2"/>
+<use href="#c34a" fill="none" stroke="#00E676" stroke-width="1.5">
+  <animate attributeName="stroke-opacity" values="0;0.55;0" dur="2s" begin="3.5s" repeatCount="indefinite"/>
+</use>
+<circle r="6" fill="#00E676" filter="url(#glow-soft)">
+  <animateMotion dur="1.0s" begin="4.0s" repeatCount="indefinite" calcMode="linear"><mpath href="#c34a"/></animateMotion>
+</circle>
+<circle r="3" fill="rgba(255,255,255,0.7)">
+  <animateMotion dur="1.0s" begin="4.05s" repeatCount="indefinite" calcMode="linear"><mpath href="#c34a"/></animateMotion>
+</circle>
+
+<!-- c45: slate-blue -->
+<use href="#c45" fill="none" stroke="rgba(255,255,255,0.12)" stroke-width="2"/>
+<use href="#c45" fill="none" stroke="#4a90d9" stroke-width="1.5">
+  <animate attributeName="stroke-opacity" values="0;0.55;0" dur="1.8s" begin="5.0s" repeatCount="indefinite"/>
+</use>
+<circle r="6" fill="#4a90d9" filter="url(#glow-soft)">
+  <animateMotion dur="0.7s" begin="5.5s" repeatCount="indefinite" calcMode="linear"><mpath href="#c45"/></animateMotion>
+</circle>
+<circle r="3" fill="rgba(255,255,255,0.7)">
+  <animateMotion dur="0.7s" begin="5.55s" repeatCount="indefinite" calcMode="linear"><mpath href="#c45"/></animateMotion>
+</circle>
+
+<!-- c36r: pink (rejected branch down) -->
+<use href="#c36r" fill="none" stroke="rgba(255,255,255,0.12)" stroke-width="2"/>
+<use href="#c36r" fill="none" stroke="#d96aa4" stroke-width="1.5">
+  <animate attributeName="stroke-opacity" values="0;0.55;0" dur="2s" begin="3.8s" repeatCount="indefinite"/>
+</use>
+<circle r="6" fill="#d96aa4" filter="url(#glow-soft)">
+  <animateMotion dur="1.0s" begin="4.3s" repeatCount="indefinite" calcMode="linear"><mpath href="#c36r"/></animateMotion>
+</circle>
+<circle r="3" fill="rgba(255,255,255,0.7)">
+  <animateMotion dur="1.0s" begin="4.35s" repeatCount="indefinite" calcMode="linear"><mpath href="#c36r"/></animateMotion>
+</circle>
+
+<!-- BRANCH LABELS -->
+<g opacity="0">
+  <animate attributeName="opacity" from="0" to="1" dur="0.5s" begin="3s" fill="freeze"/>
+  <rect x="754" y="222" width="62" height="18" rx="9"
+    fill="rgba(0,230,118,0.18)" stroke="rgba(0,230,118,0.45)" stroke-width="1"/>
+  <text x="785" y="235" text-anchor="middle"
+    font-family="'Space Grotesk',sans-serif" font-size="9" font-weight="700"
+    fill="#00E676" letter-spacing="1">APPROVED</text>
+</g>
+<g opacity="0">
+  <animate attributeName="opacity" from="0" to="1" dur="0.5s" begin="3s" fill="freeze"/>
+  <rect x="754" y="378" width="62" height="18" rx="9"
+    fill="rgba(217,106,164,0.18)" stroke="rgba(217,106,164,0.45)" stroke-width="1"/>
+  <text x="785" y="391" text-anchor="middle"
+    font-family="'Space Grotesk',sans-serif" font-size="9" font-weight="700"
+    fill="#d96aa4" letter-spacing="1">REJECTED</text>
+</g>
+
+<!-- PORT DOTS -->
+<circle cx="172" cy="310" r="3.5" fill="#EA6A47" opacity="0.7"/>
+<circle cx="238" cy="310" r="3.5" fill="#2db8b0" opacity="0.7"/>
+<circle cx="362" cy="310" r="3.5" fill="#2db8b0" opacity="0.7"/>
+<circle cx="428" cy="310" r="3.5" fill="#e8a838" opacity="0.7"/>
+<circle cx="552" cy="310" r="3.5" fill="#e8a838" opacity="0.7"/>
+<circle cx="618" cy="310" r="3.5" fill="#7c6af7" opacity="0.7"/>
+<circle cx="742" cy="310" r="3.5" fill="#7c6af7" opacity="0.7"/>
+<circle cx="838" cy="185" r="3.5" fill="#00E676" opacity="0.7"/>
+<circle cx="962" cy="185" r="3.5" fill="#00E676" opacity="0.7"/>
+<circle cx="1028" cy="185" r="3.5" fill="#4a90d9" opacity="0.7"/>
+<circle cx="838" cy="435" r="3.5" fill="#d96aa4" opacity="0.7"/>
+
+<!-- ═══════════════════ NODE CARDS ═══════════════════ -->
+
+<!-- N0: Schedule Trigger (coral) cx=110 cy=310 — TRIGGER → pulse -->
+<g opacity="0">
+  <animate attributeName="opacity" from="0" to="1" dur="0.45s" begin="0s" fill="freeze"/>
+  <rect x="48" y="248" width="124" height="124" rx="12" filter="url(#shadow)" fill="none"/>
+  <rect x="48" y="248" width="124" height="124" rx="12" fill="#252542" stroke="rgba(234,106,71,0.55)" stroke-width="1.5"/>
+  <rect x="48" y="248" width="124" height="4" rx="2" fill="#EA6A47"/>
+  <circle cx="110" cy="292" r="18" fill="rgba(234,106,71,0.15)"/>
+  <!-- clock icon -->
+  <circle cx="110" cy="292" r="8" fill="none" stroke="#EA6A47" stroke-width="1.5"/>
+  <line x1="110" y1="286" x2="110" y2="292" stroke="#EA6A47" stroke-width="1.5" stroke-linecap="round"/>
+  <line x1="110" y1="292" x2="114" y2="295" stroke="#EA6A47" stroke-width="1.5" stroke-linecap="round"/>
+  <circle cx="110" cy="292" r="1.5" fill="#EA6A47"/>
+  <text x="110" y="322" text-anchor="middle" font-family="'Space Grotesk',sans-serif" font-size="11" font-weight="600" fill="#F5EFE0">Schedule</text>
+  <text x="110" y="337" text-anchor="middle" font-family="'DM Sans',sans-serif" font-size="9" fill="rgba(245,239,224,0.42)">Mon–Fri 8am</text>
+  <text x="110" y="351" text-anchor="middle" font-family="'DM Sans',sans-serif" font-size="8.5" fill="rgba(234,106,71,0.7)">n8n Cron</text>
+  <!-- PULSE RINGS — trigger -->
+  <circle cx="110" cy="292" fill="none" stroke="#EA6A47" stroke-width="1.4">
+    <animate attributeName="r" values="18;56" dur="1.4s" begin="0.6s" repeatCount="indefinite" calcMode="ease-out"/>
+    <animate attributeName="stroke-opacity" values="0.7;0" dur="1.4s" begin="0.6s" repeatCount="indefinite" calcMode="ease-out"/>
+  </circle>
+  <circle cx="110" cy="292" fill="none" stroke="#EA6A47" stroke-width="1">
+    <animate attributeName="r" values="18;56" dur="1.4s" begin="1.1s" repeatCount="indefinite" calcMode="ease-out"/>
+    <animate attributeName="stroke-opacity" values="0.4;0" dur="1.4s" begin="1.1s" repeatCount="indefinite" calcMode="ease-out"/>
+  </circle>
+</g>
+
+<!-- N1: Fetch Brief (teal) cx=300 cy=310 — middle, NO pulse -->
+<g opacity="0">
+  <animate attributeName="opacity" from="0" to="1" dur="0.45s" begin="0.5s" fill="freeze"/>
+  <rect x="238" y="248" width="124" height="124" rx="12" filter="url(#shadow)" fill="none"/>
+  <rect x="238" y="248" width="124" height="124" rx="12" fill="#252542" stroke="rgba(45,184,176,0.55)" stroke-width="1.5"/>
+  <rect x="238" y="248" width="124" height="4" rx="2" fill="#2db8b0"/>
+  <circle cx="300" cy="292" r="18" fill="rgba(45,184,176,0.15)"/>
+  <!-- Google Sheets / fetch icon -->
+  <rect x="292" y="284" width="16" height="18" rx="2" fill="none" stroke="#2db8b0" stroke-width="1.5"/>
+  <line x1="295" y1="290" x2="305" y2="290" stroke="#2db8b0" stroke-width="1.1"/>
+  <line x1="295" y1="294" x2="305" y2="294" stroke="#2db8b0" stroke-width="1.1"/>
+  <line x1="295" y1="298" x2="302" y2="298" stroke="#2db8b0" stroke-width="1.1"/>
+  <text x="300" y="322" text-anchor="middle" font-family="'Space Grotesk',sans-serif" font-size="11" font-weight="600" fill="#F5EFE0">Fetch Brief</text>
+  <text x="300" y="337" text-anchor="middle" font-family="'DM Sans',sans-serif" font-size="9" fill="rgba(245,239,224,0.42)">Topic + voice notes</text>
+  <text x="300" y="351" text-anchor="middle" font-family="'DM Sans',sans-serif" font-size="8.5" fill="rgba(45,184,176,0.7)">Google Sheets</text>
+</g>
+
+<!-- N2: AI Draft (amber) cx=490 cy=310 — middle, NO pulse -->
+<g opacity="0">
+  <animate attributeName="opacity" from="0" to="1" dur="0.45s" begin="1.0s" fill="freeze"/>
+  <rect x="428" y="248" width="124" height="124" rx="12" filter="url(#shadow)" fill="none"/>
+  <rect x="428" y="248" width="124" height="124" rx="12" fill="#252542" stroke="rgba(232,168,56,0.55)" stroke-width="1.5"/>
+  <rect x="428" y="248" width="124" height="4" rx="2" fill="#e8a838"/>
+  <circle cx="490" cy="292" r="18" fill="rgba(232,168,56,0.15)"/>
+  <!-- AI sparkle icon -->
+  <circle cx="490" cy="291" r="5" fill="none" stroke="#e8a838" stroke-width="1.4"/>
+  <line x1="490" y1="283" x2="490" y2="281" stroke="#e8a838" stroke-width="1.5"/>
+  <line x1="496" y1="285.5" x2="497.5" y2="283.5" stroke="#e8a838" stroke-width="1.5"/>
+  <line x1="498.5" y1="291" x2="500.5" y2="291" stroke="#e8a838" stroke-width="1.5"/>
+  <line x1="496" y1="296.5" x2="497.5" y2="298.5" stroke="#e8a838" stroke-width="1.5"/>
+  <line x1="490" y1="299" x2="490" y2="301" stroke="#e8a838" stroke-width="1.5"/>
+  <line x1="484" y1="296.5" x2="482.5" y2="298.5" stroke="#e8a838" stroke-width="1.5"/>
+  <line x1="481.5" y1="291" x2="479.5" y2="291" stroke="#e8a838" stroke-width="1.5"/>
+  <line x1="484" y1="285.5" x2="482.5" y2="283.5" stroke="#e8a838" stroke-width="1.5"/>
+  <circle cx="490" cy="291" r="2.5" fill="#e8a838"/>
+  <text x="490" y="322" text-anchor="middle" font-family="'Space Grotesk',sans-serif" font-size="11" font-weight="600" fill="#F5EFE0">AI Draft Post</text>
+  <text x="490" y="337" text-anchor="middle" font-family="'DM Sans',sans-serif" font-size="9" fill="rgba(245,239,224,0.42)">Voice-matched copy</text>
+  <text x="490" y="351" text-anchor="middle" font-family="'DM Sans',sans-serif" font-size="8.5" fill="rgba(232,168,56,0.7)">Claude API</text>
+</g>
+
+<!-- N3: IF Review Score (purple) cx=680 cy=310 — middle, NO pulse -->
+<g opacity="0">
+  <animate attributeName="opacity" from="0" to="1" dur="0.45s" begin="1.5s" fill="freeze"/>
+  <rect x="618" y="248" width="124" height="124" rx="12" filter="url(#shadow)" fill="none"/>
+  <rect x="618" y="248" width="124" height="124" rx="12" fill="#252542" stroke="rgba(124,106,247,0.55)" stroke-width="1.5"/>
+  <rect x="618" y="248" width="124" height="4" rx="2" fill="#7c6af7"/>
+  <circle cx="680" cy="292" r="18" fill="rgba(124,106,247,0.15)"/>
+  <!-- IF diamond -->
+  <polygon points="680,281 691,291 680,301 669,291" fill="none" stroke="#7c6af7" stroke-width="1.5"/>
+  <text x="680" y="295" text-anchor="middle" font-family="'Space Grotesk',sans-serif" font-size="7" font-weight="700" fill="#7c6af7">IF</text>
+  <text x="680" y="322" text-anchor="middle" font-family="'Space Grotesk',sans-serif" font-size="11" font-weight="600" fill="#F5EFE0">Review Score</text>
+  <text x="680" y="337" text-anchor="middle" font-family="'DM Sans',sans-serif" font-size="9" fill="rgba(245,239,224,0.42)">Score ≥ 80 = publish</text>
+  <text x="680" y="351" text-anchor="middle" font-family="'DM Sans',sans-serif" font-size="8.5" fill="rgba(124,106,247,0.7)">n8n IF Node</text>
+</g>
+
+<!-- N4: Publish to LinkedIn (green) cx=900 cy=185 — middle (connects to N5) NO pulse -->
+<g opacity="0">
+  <animate attributeName="opacity" from="0" to="1" dur="0.45s" begin="2.0s" fill="freeze"/>
+  <rect x="838" y="123" width="124" height="124" rx="12" filter="url(#shadow)" fill="none"/>
+  <rect x="838" y="123" width="124" height="124" rx="12" fill="#252542" stroke="rgba(0,230,118,0.55)" stroke-width="1.5"/>
+  <rect x="838" y="123" width="124" height="4" rx="2" fill="#00E676"/>
+  <circle cx="900" cy="167" r="18" fill="rgba(0,230,118,0.15)"/>
+  <!-- LinkedIn "in" icon -->
+  <rect x="891" y="158" width="18" height="18" rx="3" fill="none" stroke="#00E676" stroke-width="1.5"/>
+  <line x1="895" y1="163" x2="895" y2="172" stroke="#00E676" stroke-width="1.8" stroke-linecap="round"/>
+  <circle cx="895" cy="161" r="1.3" fill="#00E676"/>
+  <line x1="899" y1="165" x2="905" y2="165" stroke="#00E676" stroke-width="1.3" stroke-linecap="round"/>
+  <line x1="905" y1="165" x2="905" y2="172" stroke="#00E676" stroke-width="1.5" stroke-linecap="round"/>
+  <line x1="899" y1="165" x2="899" y2="172" stroke="#00E676" stroke-width="1.5" stroke-linecap="round"/>
+  <text x="900" y="197" text-anchor="middle" font-family="'Space Grotesk',sans-serif" font-size="11" font-weight="600" fill="#F5EFE0">Publish Post</text>
+  <text x="900" y="212" text-anchor="middle" font-family="'DM Sans',sans-serif" font-size="9" fill="rgba(245,239,224,0.42)">Auto-schedule + post</text>
+  <text x="900" y="226" text-anchor="middle" font-family="'DM Sans',sans-serif" font-size="8.5" fill="rgba(0,230,118,0.7)">LinkedIn API</text>
+</g>
+
+<!-- N5: Slack Notify (slate-blue) cx=1090 cy=185 — TERMINAL, pulse -->
+<g opacity="0">
+  <animate attributeName="opacity" from="0" to="1" dur="0.45s" begin="2.5s" fill="freeze"/>
+  <rect x="1028" y="123" width="124" height="124" rx="12" filter="url(#shadow)" fill="none"/>
+  <rect x="1028" y="123" width="124" height="124" rx="12" fill="#252542" stroke="rgba(74,144,217,0.55)" stroke-width="1.5"/>
+  <rect x="1028" y="123" width="124" height="4" rx="2" fill="#4a90d9"/>
+  <circle cx="1090" cy="167" r="18" fill="rgba(74,144,217,0.15)"/>
+  <!-- Slack hash -->
+  <line x1="1086" y1="160" x2="1086" y2="174" stroke="#4a90d9" stroke-width="1.8"/>
+  <line x1="1094" y1="160" x2="1094" y2="174" stroke="#4a90d9" stroke-width="1.8"/>
+  <line x1="1082" y1="164" x2="1098" y2="164" stroke="#4a90d9" stroke-width="1.8"/>
+  <line x1="1082" y1="170" x2="1098" y2="170" stroke="#4a90d9" stroke-width="1.8"/>
+  <text x="1090" y="197" text-anchor="middle" font-family="'Space Grotesk',sans-serif" font-size="11" font-weight="600" fill="#F5EFE0">Notify Team</text>
+  <text x="1090" y="212" text-anchor="middle" font-family="'DM Sans',sans-serif" font-size="9" fill="rgba(245,239,224,0.42)">Post live confirmation</text>
+  <text x="1090" y="226" text-anchor="middle" font-family="'DM Sans',sans-serif" font-size="8.5" fill="rgba(74,144,217,0.7)">Slack Node</text>
+  <!-- PULSE RINGS — terminal -->
+  <circle cx="1090" cy="167" fill="none" stroke="#4a90d9" stroke-width="1.4">
+    <animate attributeName="r" values="18;56" dur="1.4s" begin="6.2s" repeatCount="indefinite" calcMode="ease-out"/>
+    <animate attributeName="stroke-opacity" values="0.7;0" dur="1.4s" begin="6.2s" repeatCount="indefinite" calcMode="ease-out"/>
+  </circle>
+  <circle cx="1090" cy="167" fill="none" stroke="#4a90d9" stroke-width="1">
+    <animate attributeName="r" values="18;56" dur="1.4s" begin="6.7s" repeatCount="indefinite" calcMode="ease-out"/>
+    <animate attributeName="stroke-opacity" values="0.4;0" dur="1.4s" begin="6.7s" repeatCount="indefinite" calcMode="ease-out"/>
+  </circle>
+</g>
+
+<!-- N6: Return Edits via Email (pink) cx=900 cy=435 — TERMINAL, pulse -->
+<g opacity="0">
+  <animate attributeName="opacity" from="0" to="1" dur="0.45s" begin="2.0s" fill="freeze"/>
+  <rect x="838" y="373" width="124" height="124" rx="12" filter="url(#shadow)" fill="none"/>
+  <rect x="838" y="373" width="124" height="124" rx="12" fill="#252542" stroke="rgba(217,106,164,0.55)" stroke-width="1.5"/>
+  <rect x="838" y="373" width="124" height="4" rx="2" fill="#d96aa4"/>
+  <circle cx="900" cy="417" r="18" fill="rgba(217,106,164,0.15)"/>
+  <!-- email envelope icon -->
+  <rect x="890" y="409" width="20" height="14" rx="2" fill="none" stroke="#d96aa4" stroke-width="1.5"/>
+  <polyline points="890,410 900,418 910,410" fill="none" stroke="#d96aa4" stroke-width="1.3"/>
+  <!-- edit pencil badge -->
+  <line x1="906" y1="419" x2="910" y2="423" stroke="#d96aa4" stroke-width="1.3" stroke-linecap="round"/>
+  <text x="900" y="447" text-anchor="middle" font-family="'Space Grotesk',sans-serif" font-size="11" font-weight="600" fill="#F5EFE0">Return Edits</text>
+  <text x="900" y="462" text-anchor="middle" font-family="'DM Sans',sans-serif" font-size="9" fill="rgba(245,239,224,0.42)">Feedback + rewrite</text>
+  <text x="900" y="476" text-anchor="middle" font-family="'DM Sans',sans-serif" font-size="8.5" fill="rgba(217,106,164,0.7)">Gmail Node</text>
+  <!-- PULSE RINGS — terminal -->
+  <circle cx="900" cy="417" fill="none" stroke="#d96aa4" stroke-width="1.4">
+    <animate attributeName="r" values="18;56" dur="1.4s" begin="5.3s" repeatCount="indefinite" calcMode="ease-out"/>
+    <animate attributeName="stroke-opacity" values="0.7;0" dur="1.4s" begin="5.3s" repeatCount="indefinite" calcMode="ease-out"/>
+  </circle>
+  <circle cx="900" cy="417" fill="none" stroke="#d96aa4" stroke-width="1">
+    <animate attributeName="r" values="18;56" dur="1.4s" begin="5.8s" repeatCount="indefinite" calcMode="ease-out"/>
+    <animate attributeName="stroke-opacity" values="0.4;0" dur="1.4s" begin="5.8s" repeatCount="indefinite" calcMode="ease-out"/>
+  </circle>
+</g>
+
+<!-- STATUS BAR -->
+<g opacity="0">
+  <animate attributeName="opacity" from="0" to="1" dur="0.5s" begin="3.5s" fill="freeze"/>
+  <rect x="200" y="580" width="800" height="48" rx="10"
+    fill="rgba(37,37,66,0.85)" stroke="rgba(255,255,255,0.07)" stroke-width="1"/>
+  <circle cx="232" cy="604" r="4" fill="#00E676">
+    <animate attributeName="opacity" values="1;0.3;1" dur="1.5s" repeatCount="indefinite"/>
+  </circle>
+  <text x="244" y="608" font-family="'Space Grotesk',sans-serif" font-size="9.5" font-weight="600" fill="#00E676">WORKFLOW ACTIVE</text>
+  <line x1="360" y1="588" x2="360" y2="620" stroke="rgba(255,255,255,0.08)" stroke-width="1"/>
+  <line x1="560" y1="588" x2="560" y2="620" stroke="rgba(255,255,255,0.08)" stroke-width="1"/>
+  <line x1="760" y1="588" x2="760" y2="620" stroke="rgba(255,255,255,0.08)" stroke-width="1"/>
+  <text x="420" y="600" text-anchor="middle" font-family="'DM Sans',sans-serif" font-size="8.5" fill="rgba(245,239,224,0.38)">AVG EXECUTION</text>
+  <text x="420" y="615" text-anchor="middle" font-family="'Space Grotesk',sans-serif" font-size="12" font-weight="700" fill="#F5EFE0">4.1s</text>
+  <text x="620" y="600" text-anchor="middle" font-family="'DM Sans',sans-serif" font-size="8.5" fill="rgba(245,239,224,0.38)">POSTS THIS WEEK</text>
+  <text x="620" y="615" text-anchor="middle" font-family="'Space Grotesk',sans-serif" font-size="12" font-weight="700" fill="#F5EFE0">5</text>
+  <text x="840" y="600" text-anchor="middle" font-family="'DM Sans',sans-serif" font-size="8.5" fill="rgba(245,239,224,0.38)">APPROVAL RATE</text>
+  <text x="840" y="615" text-anchor="middle" font-family="'Space Grotesk',sans-serif" font-size="12" font-weight="700" fill="#00E676">84%</text>
+</g>
+
+<!-- n8n BADGE -->
+<rect x="1040" y="638" width="130" height="28" rx="6"
+  fill="rgba(37,37,66,0.8)" stroke="rgba(255,255,255,0.07)" stroke-width="1"/>
+<circle cx="1056" cy="652" r="5" fill="#EA6A47"/>
+<text x="1066" y="657" font-family="'DM Sans',sans-serif" font-size="9.5"
+  font-weight="600" fill="rgba(245,239,224,0.5)">Built with n8n</text>
+
+</svg>
+</body>
+</html>
