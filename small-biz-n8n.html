@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>n8n Lead Follow-Up Flow</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;600;700&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet"/>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { width: 100%; height: 100%; overflow: hidden; background: #1a1a2e; }
+  svg { display: block; width: 100vw; height: 100vh; }
+
+  @keyframes pulse-ring {
+    0%   { r: 28; stroke-opacity: 0.6; }
+    100% { r: 52; stroke-opacity: 0; }
+  }
+  .pr { animation: pulse-ring 2.4s ease-out infinite; }
+  .pr1 { animation: pulse-ring 2.4s ease-out infinite 0.8s; }
+  .pr2 { animation: pulse-ring 2.4s ease-out infinite 1.6s; }
+
+  @keyframes status-dot {
+    0%,100% { opacity: 1; } 50% { opacity: 0.3; }
+  }
+  .sdot { animation: status-dot 1.6s ease-in-out infinite; }
+
+  @keyframes title-in {
+    from { opacity: 0; transform: translateY(-6px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  .title-g { animation: title-in 1s ease-out forwards; }
+
+  @keyframes branch-label-in {
+    from { opacity: 0; } to { opacity: 1; }
+  }
+</style>
+</head>
+<body>
+<svg viewBox="0 0 1200 680" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet">
+<defs>
+
+  <!-- Background layers -->
+  <pattern id="grid-dots" x="0" y="0" width="28" height="28" patternUnits="userSpaceOnUse">
+    <circle cx="14" cy="14" r="1" fill="rgba(255,255,255,0.055)"/>
+  </pattern>
+  <radialGradient id="vignette" cx="50%" cy="50%" r="70%">
+    <stop offset="0%" stop-color="transparent"/>
+    <stop offset="100%" stop-color="rgba(0,0,0,0.5)"/>
+  </radialGradient>
+
+  <!-- Filters -->
+  <filter id="glow-orange" x="-50%" y="-50%" width="200%" height="200%">
+    <feGaussianBlur stdDeviation="5" result="blur"/>
+    <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+  </filter>
+  <filter id="glow-soft" x="-30%" y="-30%" width="160%" height="160%">
+    <feGaussianBlur stdDeviation="3" result="blur"/>
+    <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+  </filter>
+  <filter id="shadow" x="-10%" y="-10%" width="120%" height="130%">
+    <feDropShadow dx="0" dy="4" stdDeviation="8" flood-color="#000" flood-opacity="0.5"/>
+  </filter>
+  <filter id="glow-green" x="-50%" y="-50%" width="200%" height="200%">
+    <feGaussianBlur stdDeviation="5" result="blur"/>
+    <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+  </filter>
+
+  <!--
+    LAYOUT (7 nodes total):
+    Main chain (y=310):   N0(110) → N1(300) → N2(490) → N3(680)
+    From N3 IF branch:
+      HOT  path  (y=180):  N4(870) → N5(1060)
+      COLD path  (y=440):  N6(870) → N7(1060)  [N7 removed, 6 total nodes]
+
+    6 nodes: N0=110, N1=300, N2=490, N3=680, N4(hot)=900 y=185, N5(hot)=1090 y=185
+             N6(cold)=900 y=435, N7(cold)=1090 y=435
+    We'll use 8 nodes in two rows after the IF.
+
+    Final layout:
+    Row 1 (y=310): N0(110), N1(300), N2(490), N3(680)
+    Row 2 HOT  (y=185): N4(900), N5(1095)
+    Row 3 COLD (y=435): N6(900), N7(1095)
+  -->
+
+  <!-- Connector paths -->
+  <!-- Main chain -->
+  <path id="c01" d="M 172,310 L 238,310"/>
+  <path id="c12" d="M 362,310 L 428,310"/>
+  <path id="c23" d="M 552,310 L 618,310"/>
+
+  <!-- N3 → N4 (hot, up-right) -->
+  <path id="c34h" d="M 742,310 C 790,310 810,185 838,185"/>
+  <!-- N3 → N6 (cold, down-right) -->
+  <path id="c36c" d="M 742,310 C 790,310 810,435 838,435"/>
+
+  <!-- Hot chain -->
+  <path id="c45" d="M 962,185 L 1033,185"/>
+
+  <!-- Cold chain -->
+  <path id="c67" d="M 962,435 L 1033,435"/>
+
+</defs>
+
+<!-- ── BACKGROUND ── -->
+<rect width="1200" height="680" fill="#1a1a2e"/>
+<rect width="1200" height="680" fill="url(#grid-dots)"/>
+<rect width="1200" height="680" fill="url(#vignette)"/>
+
+<!-- ── TITLE ── -->
+<g class="title-g">
+  <text x="600" y="46" text-anchor="middle"
+    font-family="'Space Grotesk',sans-serif" font-size="19" font-weight="700"
+    fill="#F5EFE0" letter-spacing="1">LEAD FOLLOW-UP AUTOMATION</text>
+  <text x="600" y="66" text-anchor="middle"
+    font-family="'DM Sans',sans-serif" font-size="10.5"
+    fill="rgba(245,239,224,0.38)" letter-spacing="3">
+    FORM SUBMITTED → QUALIFIED → ROUTED → RESPONDED TO — AUTOMATICALLY
+  </text>
+</g>
+
+<!-- ══════════════════════════════════════════
+     CONNECTOR LINES + DATA PACKETS
+     ══════════════════════════════════════════ -->
+
+<!-- c01: Form → Enrich -->
+<use href="#c01" stroke="rgba(255,255,255,0.12)" stroke-width="2" fill="none"/>
+<use href="#c01" stroke="#EA6A47" stroke-width="2" fill="none" opacity="0">
+  <animate attributeName="opacity" values="0;0.7;0" dur="3s" begin="0s" repeatCount="indefinite"/>
+</use>
+<circle r="6" fill="#EA6A47" filter="url(#glow-soft)" opacity="0">
+  <animateMotion dur="0.7s" begin="0.6s" repeatCount="indefinite"><mpath href="#c01"/></animateMotion>
+  <animate attributeName="opacity" values="0;1;1;0" keyTimes="0;0.1;0.85;1" dur="0.7s" begin="0.6s" repeatCount="indefinite"/>
+</circle>
+<circle r="3" fill="#F5EFE0" opacity="0">
+  <animateMotion dur="0.7s" begin="0.65s" repeatCount="indefinite"><mpath href="#c01"/></animateMotion>
+  <animate attributeName="opacity" values="0;0.6;0.6;0" keyTimes="0;0.1;0.85;1" dur="0.7s" begin="0.65s" repeatCount="indefinite"/>
+</circle>
+
+<!-- c12: Enrich → AI Score -->
+<use href="#c12" stroke="rgba(255,255,255,0.12)" stroke-width="2" fill="none"/>
+<use href="#c12" stroke="#2db8b0" stroke-width="2" fill="none" opacity="0">
+  <animate attributeName="opacity" values="0;0.7;0" dur="3s" begin="0.5s" repeatCount="indefinite"/>
+</use>
+<circle r="6" fill="#2db8b0" filter="url(#glow-soft)" opacity="0">
+  <animateMotion dur="0.7s" begin="1.6s" repeatCount="indefinite"><mpath href="#c12"/></animateMotion>
+  <animate attributeName="opacity" values="0;1;1;0" keyTimes="0;0.1;0.85;1" dur="0.7s" begin="1.6s" repeatCount="indefinite"/>
+</circle>
+<circle r="3" fill="#F5EFE0" opacity="0">
+  <animateMotion dur="0.7s" begin="1.65s" repeatCount="indefinite"><mpath href="#c12"/></animateMotion>
+  <animate attributeName="opacity" values="0;0.6;0.6;0" keyTimes="0;0.1;0.85;1" dur="0.7s" begin="1.65s" repeatCount="indefinite"/>
+</circle>
+
+<!-- c23: AI Score → IF Branch -->
+<use href="#c23" stroke="rgba(255,255,255,0.12)" stroke-width="2" fill="none"/>
+<use href="#c23" stroke="#e8a838" stroke-width="2" fill="none" opacity="0">
+  <animate attributeName="opacity" values="0;0.7;0" dur="3s" begin="1s" repeatCount="indefinite"/>
+</use>
+<circle r="6" fill="#e8a838" filter="url(#glow-soft)" opacity="0">
+  <animateMotion dur="0.7s" begin="2.6s" repeatCount="indefinite"><mpath href="#c23"/></animateMotion>
+  <animate attributeName="opacity" values="0;1;1;0" keyTimes="0;0.1;0.85;1" dur="0.7s" begin="2.6s" repeatCount="indefinite"/>
+</circle>
+<circle r="3" fill="#F5EFE0" opacity="0">
+  <animateMotion dur="0.7s" begin="2.65s" repeatCount="indefinite"><mpath href="#c23"/></animateMotion>
+  <animate attributeName="opacity" values="0;0.6;0.6;0" keyTimes="0;0.1;0.85;1" dur="0.7s" begin="2.65s" repeatCount="indefinite"/>
+</circle>
+
+<!-- c34h: IF → Hot path (Slack) -->
+<use href="#c34h" stroke="rgba(255,255,255,0.12)" stroke-width="2" fill="none"/>
+<use href="#c34h" stroke="#00E676" stroke-width="2" fill="none" opacity="0">
+  <animate attributeName="opacity" values="0;0.8;0" dur="3.2s" begin="1.4s" repeatCount="indefinite"/>
+</use>
+<circle r="6" fill="#00E676" filter="url(#glow-green)" opacity="0">
+  <animateMotion dur="1.0s" begin="3.6s" repeatCount="indefinite"><mpath href="#c34h"/></animateMotion>
+  <animate attributeName="opacity" values="0;1;1;0" keyTimes="0;0.1;0.85;1" dur="1.0s" begin="3.6s" repeatCount="indefinite"/>
+</circle>
+
+<!-- c36c: IF → Cold path (nurture) -->
+<use href="#c36c" stroke="rgba(255,255,255,0.12)" stroke-width="2" fill="none"/>
+<use href="#c36c" stroke="#4a90d9" stroke-width="2" fill="none" opacity="0">
+  <animate attributeName="opacity" values="0;0.8;0" dur="3.2s" begin="2.0s" repeatCount="indefinite"/>
+</use>
+<circle r="6" fill="#4a90d9" filter="url(#glow-soft)" opacity="0">
+  <animateMotion dur="1.0s" begin="4.6s" repeatCount="indefinite"><mpath href="#c36c"/></animateMotion>
+  <animate attributeName="opacity" values="0;1;1;0" keyTimes="0;0.1;0.85;1" dur="1.0s" begin="4.6s" repeatCount="indefinite"/>
+</circle>
+
+<!-- c45: Slack Alert → CRM Update -->
+<use href="#c45" stroke="rgba(255,255,255,0.12)" stroke-width="2" fill="none"/>
+<use href="#c45" stroke="#00E676" stroke-width="2" fill="none" opacity="0">
+  <animate attributeName="opacity" values="0;0.7;0" dur="3s" begin="1.8s" repeatCount="indefinite"/>
+</use>
+<circle r="6" fill="#00E676" filter="url(#glow-soft)" opacity="0">
+  <animateMotion dur="0.7s" begin="4.7s" repeatCount="indefinite"><mpath href="#c45"/></animateMotion>
+  <animate attributeName="opacity" values="0;1;1;0" keyTimes="0;0.1;0.85;1" dur="0.7s" begin="4.7s" repeatCount="indefinite"/>
+</circle>
+
+<!-- c67: Email Sequence → Wait/Rescheduled -->
+<use href="#c67" stroke="rgba(255,255,255,0.12)" stroke-width="2" fill="none"/>
+<use href="#c67" stroke="#4a90d9" stroke-width="2" fill="none" opacity="0">
+  <animate attributeName="opacity" values="0;0.7;0" dur="3s" begin="2.4s" repeatCount="indefinite"/>
+</use>
+<circle r="6" fill="#4a90d9" filter="url(#glow-soft)" opacity="0">
+  <animateMotion dur="0.7s" begin="5.7s" repeatCount="indefinite"><mpath href="#c67"/></animateMotion>
+  <animate attributeName="opacity" values="0;1;1;0" keyTimes="0;0.1;0.85;1" dur="0.7s" begin="5.7s" repeatCount="indefinite"/>
+</circle>
+
+<!-- ══════════════════════════════════════════
+     BRANCH LABELS
+     ══════════════════════════════════════════ -->
+<!-- HOT label -->
+<g opacity="0">
+  <animate attributeName="opacity" from="0" to="1" dur="0.5s" begin="3s" fill="freeze"/>
+  <rect x="766" y="224" width="46" height="18" rx="9" fill="rgba(0,230,118,0.18)" stroke="rgba(0,230,118,0.45)" stroke-width="1"/>
+  <text x="789" y="237" text-anchor="middle"
+    font-family="'Space Grotesk',sans-serif" font-size="9" font-weight="700"
+    fill="#00E676" letter-spacing="1">HOT</text>
+</g>
+<!-- COLD label -->
+<g opacity="0">
+  <animate attributeName="opacity" from="0" to="1" dur="0.5s" begin="3s" fill="freeze"/>
+  <rect x="762" y="368" width="54" height="18" rx="9" fill="rgba(74,144,217,0.18)" stroke="rgba(74,144,217,0.45)" stroke-width="1"/>
+  <text x="789" y="381" text-anchor="middle"
+    font-family="'Space Grotesk',sans-serif" font-size="9" font-weight="700"
+    fill="#4a90d9" letter-spacing="1">COLD</text>
+</g>
+
+<!-- ══════════════════════════════════════════
+     PORT DOTS
+     ══════════════════════════════════════════ -->
+<circle cx="172" cy="310" r="5" fill="#EA6A47" opacity="0.7"/>
+<circle cx="238" cy="310" r="5" fill="#EA6A47" opacity="0.7"/>
+<circle cx="362" cy="310" r="5" fill="#2db8b0" opacity="0.7"/>
+<circle cx="428" cy="310" r="5" fill="#2db8b0" opacity="0.7"/>
+<circle cx="552" cy="310" r="5" fill="#e8a838" opacity="0.7"/>
+<circle cx="618" cy="310" r="5" fill="#e8a838" opacity="0.7"/>
+<!-- IF → hot -->
+<circle cx="742" cy="310" r="5" fill="#7c6af7" opacity="0.7"/>
+<circle cx="838" cy="185" r="5" fill="#00E676" opacity="0.7"/>
+<!-- IF → cold -->
+<circle cx="838" cy="435" r="5" fill="#4a90d9" opacity="0.7"/>
+<!-- hot chain -->
+<circle cx="962" cy="185" r="5" fill="#00E676" opacity="0.7"/>
+<circle cx="1033" cy="185" r="5" fill="#2da47e" opacity="0.7"/>
+<!-- cold chain -->
+<circle cx="962" cy="435" r="5" fill="#4a90d9" opacity="0.7"/>
+<circle cx="1033" cy="435" r="5" fill="#d96aa4" opacity="0.7"/>
+
+<!-- ══════════════════════════════════════════
+     NODE CARDS
+     ══════════════════════════════════════════ -->
+
+<!-- ── N0: TRIGGER — Form Submitted (cx=110, cy=310) ── -->
+<g opacity="0">
+  <animate attributeName="opacity" from="0" to="1" dur="0.45s" begin="0.5s" fill="freeze"/>
+  <rect x="48" y="248" width="124" height="124" rx="12" filter="url(#shadow)" fill="none"/>
+  <rect x="48" y="248" width="124" height="124" rx="12" fill="#252542" stroke="rgba(234,106,71,0.55)" stroke-width="1.5"/>
+  <rect x="48" y="248" width="124" height="4" rx="2" fill="#EA6A47"/>
+  <!-- Icon bg -->
+  <circle cx="110" cy="292" r="18" fill="rgba(234,106,71,0.15)"/>
+  <!-- Icon: form/envelope -->
+  <rect x="99" y="283" width="22" height="16" rx="3" fill="none" stroke="#EA6A47" stroke-width="1.6"/>
+  <polyline points="99,283 110,293 121,283" fill="none" stroke="#EA6A47" stroke-width="1.6"/>
+  <!-- Labels -->
+  <text x="110" y="322" text-anchor="middle"
+    font-family="'Space Grotesk',sans-serif" font-size="11" font-weight="600" fill="#F5EFE0">FORM SUBMITTED</text>
+  <text x="110" y="337" text-anchor="middle"
+    font-family="'DM Sans',sans-serif" font-size="9" fill="rgba(245,239,224,0.42)">Webhook Trigger</text>
+  <text x="110" y="351" text-anchor="middle"
+    font-family="'DM Sans',sans-serif" font-size="8.5" fill="rgba(234,106,71,0.7)">Typeform / Website</text>
+  <!-- Pulse ring -->
+  <circle class="pr" cx="110" cy="292" r="28" fill="none" stroke="#EA6A47" stroke-width="1.2"/>
+  <circle class="pr1" cx="110" cy="292" r="28" fill="none" stroke="#EA6A47" stroke-width="1"/>
+</g>
+
+<!-- ── N1: ENRICH — Get Contact Info (cx=300, cy=310) ── -->
+<g opacity="0">
+  <animate attributeName="opacity" from="0" to="1" dur="0.45s" begin="1.0s" fill="freeze"/>
+  <rect x="238" y="248" width="124" height="124" rx="12" filter="url(#shadow)" fill="none"/>
+  <rect x="238" y="248" width="124" height="124" rx="12" fill="#252542" stroke="rgba(45,184,176,0.55)" stroke-width="1.5"/>
+  <rect x="238" y="248" width="124" height="4" rx="2" fill="#2db8b0"/>
+  <circle cx="300" cy="292" r="18" fill="rgba(45,184,176,0.15)"/>
+  <!-- Icon: person + magnifier -->
+  <circle cx="297" cy="287" r="5" fill="none" stroke="#2db8b0" stroke-width="1.5"/>
+  <line x1="297" y1="292" x2="297" y2="300" stroke="#2db8b0" stroke-width="1.5"/>
+  <line x1="291" y1="296" x2="303" y2="296" stroke="#2db8b0" stroke-width="1.5"/>
+  <circle cx="308" cy="296" r="4" fill="none" stroke="#2db8b0" stroke-width="1.4"/>
+  <line x1="311" y1="299" x2="314" y2="302" stroke="#2db8b0" stroke-width="1.6"/>
+  <!-- Labels -->
+  <text x="300" y="322" text-anchor="middle"
+    font-family="'Space Grotesk',sans-serif" font-size="11" font-weight="600" fill="#F5EFE0">ENRICH LEAD</text>
+  <text x="300" y="337" text-anchor="middle"
+    font-family="'DM Sans',sans-serif" font-size="9" fill="rgba(245,239,224,0.42)">HTTP Request</text>
+  <text x="300" y="351" text-anchor="middle"
+    font-family="'DM Sans',sans-serif" font-size="8.5" fill="rgba(45,184,176,0.7)">Clearbit / Apollo</text>
+</g>
+
+<!-- ── N2: AI SCORE — Claude API (cx=490, cy=310) ── -->
+<g opacity="0">
+  <animate attributeName="opacity" from="0" to="1" dur="0.45s" begin="1.5s" fill="freeze"/>
+  <rect x="428" y="248" width="124" height="124" rx="12" filter="url(#shadow)" fill="none"/>
+  <rect x="428" y="248" width="124" height="124" rx="12" fill="#252542" stroke="rgba(232,168,56,0.55)" stroke-width="1.5"/>
+  <rect x="428" y="248" width="124" height="4" rx="2" fill="#e8a838"/>
+  <circle cx="490" cy="292" r="18" fill="rgba(232,168,56,0.15)"/>
+  <!-- Icon: brain/spark -->
+  <circle cx="490" cy="291" r="7" fill="none" stroke="#e8a838" stroke-width="1.5"/>
+  <line x1="490" y1="282" x2="490" y2="279" stroke="#e8a838" stroke-width="1.5"/>
+  <line x1="497" y1="285" x2="499" y2="283" stroke="#e8a838" stroke-width="1.5"/>
+  <line x1="499" y1="291" x2="502" y2="291" stroke="#e8a838" stroke-width="1.5"/>
+  <line x1="483" y1="285" x2="481" y2="283" stroke="#e8a838" stroke-width="1.5"/>
+  <line x1="481" y1="291" x2="478" y2="291" stroke="#e8a838" stroke-width="1.5"/>
+  <!-- Labels -->
+  <text x="490" y="322" text-anchor="middle"
+    font-family="'Space Grotesk',sans-serif" font-size="11" font-weight="600" fill="#F5EFE0">AI LEAD SCORE</text>
+  <text x="490" y="337" text-anchor="middle"
+    font-family="'DM Sans',sans-serif" font-size="9" fill="rgba(245,239,224,0.42)">Claude API Node</text>
+  <text x="490" y="351" text-anchor="middle"
+    font-family="'DM Sans',sans-serif" font-size="8.5" fill="rgba(232,168,56,0.7)">Hot / Cold / Nurture</text>
+</g>
+
+<!-- ── N3: IF — Route by Score (cx=680, cy=310) ── -->
+<g opacity="0">
+  <animate attributeName="opacity" from="0" to="1" dur="0.45s" begin="2.0s" fill="freeze"/>
+  <rect x="618" y="248" width="124" height="124" rx="12" filter="url(#shadow)" fill="none"/>
+  <rect x="618" y="248" width="124" height="124" rx="12" fill="#252542" stroke="rgba(124,106,247,0.55)" stroke-width="1.5"/>
+  <rect x="618" y="248" width="124" height="4" rx="2" fill="#7c6af7"/>
+  <circle cx="680" cy="292" r="18" fill="rgba(124,106,247,0.15)"/>
+  <!-- Icon: diamond/branch -->
+  <polygon points="680,280 692,292 680,304 668,292" fill="none" stroke="#7c6af7" stroke-width="1.6"/>
+  <line x1="692" y1="289" x2="697" y2="285" stroke="#7c6af7" stroke-width="1.3"/>
+  <line x1="692" y1="295" x2="697" y2="299" stroke="#7c6af7" stroke-width="1.3"/>
+  <!-- Labels -->
+  <text x="680" y="322" text-anchor="middle"
+    font-family="'Space Grotesk',sans-serif" font-size="11" font-weight="600" fill="#F5EFE0">IF / SWITCH</text>
+  <text x="680" y="337" text-anchor="middle"
+    font-family="'DM Sans',sans-serif" font-size="9" fill="rgba(245,239,224,0.42)">Route by Score</text>
+  <text x="680" y="351" text-anchor="middle"
+    font-family="'DM Sans',sans-serif" font-size="8.5" fill="rgba(124,106,247,0.7)">≥7 = Hot · &lt;7 = Cold</text>
+</g>
+
+<!-- ══ HOT PATH ROW (y=185) ══ -->
+
+<!-- ── N4: SLACK ALERT — Hot Lead (cx=900, cy=185) ── -->
+<g opacity="0">
+  <animate attributeName="opacity" from="0" to="1" dur="0.45s" begin="2.5s" fill="freeze"/>
+  <rect x="838" y="123" width="124" height="124" rx="12" filter="url(#shadow)" fill="none"/>
+  <rect x="838" y="123" width="124" height="124" rx="12" fill="#252542" stroke="rgba(0,230,118,0.55)" stroke-width="1.5"/>
+  <rect x="838" y="123" width="124" height="4" rx="2" fill="#00E676"/>
+  <circle cx="900" cy="167" r="18" fill="rgba(0,230,118,0.15)"/>
+  <!-- Icon: Slack hashtag -->
+  <line x1="896" y1="160" x2="896" y2="174" stroke="#00E676" stroke-width="2"/>
+  <line x1="904" y1="160" x2="904" y2="174" stroke="#00E676" stroke-width="2"/>
+  <line x1="893" y1="164" x2="907" y2="164" stroke="#00E676" stroke-width="2"/>
+  <line x1="893" y1="170" x2="907" y2="170" stroke="#00E676" stroke-width="2"/>
+  <!-- Labels -->
+  <text x="900" y="197" text-anchor="middle"
+    font-family="'Space Grotesk',sans-serif" font-size="11" font-weight="600" fill="#F5EFE0">SLACK ALERT</text>
+  <text x="900" y="212" text-anchor="middle"
+    font-family="'DM Sans',sans-serif" font-size="9" fill="rgba(245,239,224,0.42)">Notify Owner</text>
+  <text x="900" y="226" text-anchor="middle"
+    font-family="'DM Sans',sans-serif" font-size="8.5" fill="rgba(0,230,118,0.7)">#hot-leads channel</text>
+</g>
+
+<!-- ── N5: CRM CREATE — Log Hot Lead (cx=1095, cy=185) ── -->
+<g opacity="0">
+  <animate attributeName="opacity" from="0" to="1" dur="0.45s" begin="3.0s" fill="freeze"/>
+  <rect x="1033" y="123" width="124" height="124" rx="12" filter="url(#shadow)" fill="none"/>
+  <rect x="1033" y="123" width="124" height="124" rx="12" fill="#252542" stroke="rgba(45,164,126,0.55)" stroke-width="1.5"/>
+  <rect x="1033" y="123" width="124" height="4" rx="2" fill="#2da47e"/>
+  <circle cx="1095" cy="167" r="18" fill="rgba(45,164,126,0.15)"/>
+  <!-- Icon: database -->
+  <ellipse cx="1095" cy="161" rx="9" ry="3.5" fill="none" stroke="#2da47e" stroke-width="1.5"/>
+  <line x1="1086" y1="161" x2="1086" y2="173" stroke="#2da47e" stroke-width="1.5"/>
+  <line x1="1104" y1="161" x2="1104" y2="173" stroke="#2da47e" stroke-width="1.5"/>
+  <ellipse cx="1095" cy="173" rx="9" ry="3.5" fill="none" stroke="#2da47e" stroke-width="1.5"/>
+  <!-- Labels -->
+  <text x="1095" y="197" text-anchor="middle"
+    font-family="'Space Grotesk',sans-serif" font-size="11" font-weight="600" fill="#F5EFE0">CRM — NEW DEAL</text>
+  <text x="1095" y="212" text-anchor="middle"
+    font-family="'DM Sans',sans-serif" font-size="9" fill="rgba(245,239,224,0.42)">Create Record</text>
+  <text x="1095" y="226" text-anchor="middle"
+    font-family="'DM Sans',sans-serif" font-size="8.5" fill="rgba(45,164,126,0.7)">HubSpot / Pipedrive</text>
+</g>
+
+<!-- ══ COLD PATH ROW (y=435) ══ -->
+
+<!-- ── N6: EMAIL SEQUENCE — Nurture (cx=900, cy=435) ── -->
+<g opacity="0">
+  <animate attributeName="opacity" from="0" to="1" dur="0.45s" begin="2.5s" fill="freeze"/>
+  <rect x="838" y="373" width="124" height="124" rx="12" filter="url(#shadow)" fill="none"/>
+  <rect x="838" y="373" width="124" height="124" rx="12" fill="#252542" stroke="rgba(74,144,217,0.55)" stroke-width="1.5"/>
+  <rect x="838" y="373" width="124" height="4" rx="2" fill="#4a90d9"/>
+  <circle cx="900" cy="417" r="18" fill="rgba(74,144,217,0.15)"/>
+  <!-- Icon: envelope -->
+  <rect x="889" y="409" width="22" height="16" rx="3" fill="none" stroke="#4a90d9" stroke-width="1.5"/>
+  <polyline points="889,409 900,419 911,409" fill="none" stroke="#4a90d9" stroke-width="1.5"/>
+  <!-- Labels -->
+  <text x="900" y="447" text-anchor="middle"
+    font-family="'Space Grotesk',sans-serif" font-size="11" font-weight="600" fill="#F5EFE0">EMAIL SEQUENCE</text>
+  <text x="900" y="462" text-anchor="middle"
+    font-family="'DM Sans',sans-serif" font-size="9" fill="rgba(245,239,224,0.42)">Send → Wait 3d → Send</text>
+  <text x="900" y="476" text-anchor="middle"
+    font-family="'DM Sans',sans-serif" font-size="8.5" fill="rgba(74,144,217,0.7)">Gmail / Mailchimp</text>
+</g>
+
+<!-- ── N7: CRM TAG — Mark as Nurture (cx=1095, cy=435) ── -->
+<g opacity="0">
+  <animate attributeName="opacity" from="0" to="1" dur="0.45s" begin="3.0s" fill="freeze"/>
+  <rect x="1033" y="373" width="124" height="124" rx="12" filter="url(#shadow)" fill="none"/>
+  <rect x="1033" y="373" width="124" height="124" rx="12" fill="#252542" stroke="rgba(217,106,164,0.55)" stroke-width="1.5"/>
+  <rect x="1033" y="373" width="124" height="4" rx="2" fill="#d96aa4"/>
+  <circle cx="1095" cy="417" r="18" fill="rgba(217,106,164,0.15)"/>
+  <!-- Icon: tag -->
+  <rect x="1085" y="408" width="16" height="12" rx="2" fill="none" stroke="#d96aa4" stroke-width="1.5"/>
+  <circle cx="1088" cy="411" r="1.5" fill="#d96aa4"/>
+  <line x1="1101" y1="411" x2="1106" y2="411" stroke="#d96aa4" stroke-width="1.4"/>
+  <line x1="1106" y1="411" x2="1106" y2="419" stroke="#d96aa4" stroke-width="1.4"/>
+  <line x1="1101" y1="419" x2="1106" y2="419" stroke="#d96aa4" stroke-width="1.4"/>
+  <!-- Labels -->
+  <text x="1095" y="447" text-anchor="middle"
+    font-family="'Space Grotesk',sans-serif" font-size="11" font-weight="600" fill="#F5EFE0">CRM — TAG LEAD</text>
+  <text x="1095" y="462" text-anchor="middle"
+    font-family="'DM Sans',sans-serif" font-size="9" fill="rgba(245,239,224,0.42)">Update Contact</text>
+  <text x="1095" y="476" text-anchor="middle"
+    font-family="'DM Sans',sans-serif" font-size="8.5" fill="rgba(217,106,164,0.7)">Tag: nurture-sequence</text>
+</g>
+
+<!-- ══════════════════════════════════════════
+     EXECUTION STATUS BAR
+     ══════════════════════════════════════════ -->
+<g opacity="0">
+  <animate attributeName="opacity" from="0" to="1" dur="0.6s" begin="3.5s" fill="freeze"/>
+  <rect x="200" y="580" width="800" height="48" rx="10"
+    fill="rgba(37,37,66,0.85)" stroke="rgba(255,255,255,0.07)" stroke-width="1"/>
+
+  <!-- Active indicator -->
+  <circle class="sdot" cx="240" cy="604" r="5" fill="#00E676" filter="url(#glow-soft)"/>
+  <text x="252" y="600" font-family="'DM Sans',sans-serif" font-size="9" font-weight="600" fill="rgba(245,239,224,0.5)">WORKFLOW</text>
+  <text x="252" y="613" font-family="'Space Grotesk',sans-serif" font-size="11" font-weight="700" fill="#00E676">ACTIVE</text>
+
+  <!-- Divider -->
+  <line x1="320" y1="588" x2="320" y2="620" stroke="rgba(255,255,255,0.08)" stroke-width="1"/>
+
+  <!-- Avg execution -->
+  <text x="360" y="600" font-family="'DM Sans',sans-serif" font-size="9" font-weight="600" fill="rgba(245,239,224,0.5)">AVG EXECUTION</text>
+  <text x="360" y="613" font-family="'Space Grotesk',sans-serif" font-size="11" font-weight="700" fill="#e8a838">2.4s</text>
+
+  <!-- Divider -->
+  <line x1="460" y1="588" x2="460" y2="620" stroke="rgba(255,255,255,0.08)" stroke-width="1"/>
+
+  <!-- Leads today -->
+  <text x="500" y="600" font-family="'DM Sans',sans-serif" font-size="9" font-weight="600" fill="rgba(245,239,224,0.5)">LEADS TODAY</text>
+  <text x="500" y="613" font-family="'Space Grotesk',sans-serif" font-size="11" font-weight="700" fill="#EA6A47">34</text>
+
+  <!-- Divider -->
+  <line x1="590" y1="588" x2="590" y2="620" stroke="rgba(255,255,255,0.08)" stroke-width="1"/>
+
+  <!-- Hot leads -->
+  <text x="630" y="600" font-family="'DM Sans',sans-serif" font-size="9" font-weight="600" fill="rgba(245,239,224,0.5)">HOT LEADS</text>
+  <text x="630" y="613" font-family="'Space Grotesk',sans-serif" font-size="11" font-weight="700" fill="#00E676">11</text>
+
+  <!-- Divider -->
+  <line x1="720" y1="588" x2="720" y2="620" stroke="rgba(255,255,255,0.08)" stroke-width="1"/>
+
+  <!-- Success rate -->
+  <text x="760" y="600" font-family="'DM Sans',sans-serif" font-size="9" font-weight="600" fill="rgba(245,239,224,0.5)">SUCCESS RATE</text>
+  <text x="760" y="613" font-family="'Space Grotesk',sans-serif" font-size="11" font-weight="700" fill="#00E676">99.1%</text>
+</g>
+
+<!-- ── n8n badge ── -->
+<rect x="1040" y="638" width="130" height="28" rx="6"
+  fill="rgba(37,37,66,0.8)" stroke="rgba(255,255,255,0.07)" stroke-width="1"/>
+<circle cx="1056" cy="652" r="5" fill="#EA6A47"/>
+<text x="1066" y="657"
+  font-family="'DM Sans',sans-serif" font-size="9.5" font-weight="600"
+  fill="rgba(245,239,224,0.5)">Built with n8n</text>
+
+</svg>
+</body>
+</html>
