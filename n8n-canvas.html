@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>n8n Workflow: Trigger to Email</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { width: 100%; height: 100%; overflow: hidden; background: #1a1a2e; font-family: 'Inter', sans-serif; }
+  svg { display: block; width: 100vw; height: 100vh; }
+</style>
+</head>
+<body>
+<svg viewBox="0 0 1100 620" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet">
+  <defs>
+
+    <!-- ── Filters ── -->
+    <filter id="glow-orange" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="5" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <filter id="glow-soft" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="3" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <filter id="glow-node" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="6" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <filter id="shadow" x="-10%" y="-10%" width="120%" height="130%">
+      <feDropShadow dx="0" dy="4" stdDeviation="8" flood-color="#000" flood-opacity="0.5"/>
+    </filter>
+    <filter id="canvas-bg-blur" x="0" y="0" width="100%" height="100%">
+      <feGaussianBlur stdDeviation="0.4"/>
+    </filter>
+
+    <!-- ── Grid pattern (n8n canvas dots) ── -->
+    <pattern id="grid-dots" x="0" y="0" width="28" height="28" patternUnits="userSpaceOnUse">
+      <circle cx="14" cy="14" r="1" fill="rgba(255,255,255,0.055)"/>
+    </pattern>
+
+    <!-- ── Connection paths between node centres ── -->
+    <!-- Node centres (x): 110, 290, 470, 650, 830, 1010 → but we use 5 nodes -->
+    <!-- Node Y centre = 310 -->
+    <!-- N1 centre: 110,310  N2: 310,310  N3: 510,310  N4: 710,310  N5: 910,310 -->
+    <!-- Connector exits right edge of node (+65) and enters left edge (-65) -->
+
+    <!-- Bezier connectors (n8n uses slight curves) -->
+    <path id="conn-1-2" d="M 175,310 C 220,310 265,310 245,310"/>
+    <!-- straight lines for simplicity - n8n style is straight with slight bezier -->
+    <path id="conn-1-2" d="M 177,310 L 243,310"/>
+    <path id="conn-2-3" d="M 377,310 L 443,310"/>
+    <path id="conn-3-4" d="M 577,310 L 643,310"/>
+    <path id="conn-4-5" d="M 777,310 L 843,310"/>
+
+    <!-- Node icon clip circles -->
+    <clipPath id="clip-n1"><rect x="48" y="248" width="124" height="124" rx="12"/></clipPath>
+    <clipPath id="clip-n2"><rect x="248" y="248" width="124" height="124" rx="12"/></clipPath>
+    <clipPath id="clip-n3"><rect x="448" y="248" width="124" height="124" rx="12"/></clipPath>
+    <clipPath id="clip-n4"><rect x="648" y="248" width="124" height="124" rx="12"/></clipPath>
+    <clipPath id="clip-n5"><rect x="848" y="248" width="124" height="124" rx="12"/></clipPath>
+
+  </defs>
+
+  <!-- ══════════════════════════════════════════ -->
+  <!--  BACKGROUND                                -->
+  <!-- ══════════════════════════════════════════ -->
+  <rect width="1100" height="620" fill="#1a1a2e"/>
+  <!-- Dot grid -->
+  <rect width="1100" height="620" fill="url(#grid-dots)"/>
+  <!-- Subtle vignette -->
+  <radialGradient id="vignette" cx="50%" cy="50%" r="70%">
+    <stop offset="0%" stop-color="transparent"/>
+    <stop offset="100%" stop-color="rgba(0,0,0,0.45)"/>
+  </radialGradient>
+  <rect width="1100" height="620" fill="url(#vignette)"/>
+  <!-- Ambient glow behind workflow -->
+  <ellipse cx="550" cy="310" rx="480" ry="120" fill="#EA6A47" opacity="0.025"/>
+
+  <!-- ══════════════════════════════════════════ -->
+  <!--  TITLE                                     -->
+  <!-- ══════════════════════════════════════════ -->
+  <g opacity="0">
+    <animate attributeName="opacity" from="0" to="1" dur="0.5s" begin="0.1s" fill="freeze"/>
+    <text x="550" y="52" text-anchor="middle" fill="#F5EFE0" font-size="20" font-weight="700" letter-spacing="0.5">Trigger → Email</text>
+    <text x="550" y="74" text-anchor="middle" fill="rgba(245,239,224,0.38)" font-size="11" font-weight="400" letter-spacing="3">AN AUTOMATION WORKFLOW IN 5 NODES</text>
+  </g>
+
+  <!-- ══════════════════════════════════════════ -->
+  <!--  CONNECTOR LINES (rendered under nodes)    -->
+  <!-- ══════════════════════════════════════════ -->
+
+  <!-- Line 1→2 -->
+  <use href="#conn-1-2" stroke="rgba(255,255,255,0.12)" stroke-width="2" fill="none"/>
+  <!-- animated glow version -->
+  <use href="#conn-1-2" stroke="#EA6A47" stroke-width="2" fill="none" opacity="0">
+    <animate attributeName="opacity" values="0;0.7;0" dur="3s" begin="0.8s" repeatCount="indefinite"/>
+  </use>
+
+  <!-- Line 2→3 -->
+  <use href="#conn-2-3" stroke="rgba(255,255,255,0.12)" stroke-width="2" fill="none"/>
+  <use href="#conn-2-3" stroke="#EA6A47" stroke-width="2" fill="none" opacity="0">
+    <animate attributeName="opacity" values="0;0.7;0" dur="3s" begin="1.8s" repeatCount="indefinite"/>
+  </use>
+
+  <!-- Line 3→4 -->
+  <use href="#conn-3-4" stroke="rgba(255,255,255,0.12)" stroke-width="2" fill="none"/>
+  <use href="#conn-3-4" stroke="#EA6A47" stroke-width="2" fill="none" opacity="0">
+    <animate attributeName="opacity" values="0;0.7;0" dur="3s" begin="2.8s" repeatCount="indefinite"/>
+  </use>
+
+  <!-- Line 4→5 -->
+  <use href="#conn-4-5" stroke="rgba(255,255,255,0.12)" stroke-width="2" fill="none"/>
+  <use href="#conn-4-5" stroke="#EA6A47" stroke-width="2" fill="none" opacity="0">
+    <animate attributeName="opacity" values="0;0.7;0" dur="3s" begin="3.8s" repeatCount="indefinite"/>
+  </use>
+
+  <!-- Connection port dots -->
+  <!-- Right ports -->
+  <circle cx="177" cy="310" r="5" fill="#2d2d4e" stroke="rgba(255,255,255,0.25)" stroke-width="1.5"/>
+  <circle cx="377" cy="310" r="5" fill="#2d2d4e" stroke="rgba(255,255,255,0.25)" stroke-width="1.5"/>
+  <circle cx="577" cy="310" r="5" fill="#2d2d4e" stroke="rgba(255,255,255,0.25)" stroke-width="1.5"/>
+  <circle cx="777" cy="310" r="5" fill="#2d2d4e" stroke="rgba(255,255,255,0.25)" stroke-width="1.5"/>
+  <!-- Left ports -->
+  <circle cx="243" cy="310" r="5" fill="#2d2d4e" stroke="rgba(255,255,255,0.25)" stroke-width="1.5"/>
+  <circle cx="443" cy="310" r="5" fill="#2d2d4e" stroke="rgba(255,255,255,0.25)" stroke-width="1.5"/>
+  <circle cx="643" cy="310" r="5" fill="#2d2d4e" stroke="rgba(255,255,255,0.25)" stroke-width="1.5"/>
+  <circle cx="843" cy="310" r="5" fill="#2d2d4e" stroke="rgba(255,255,255,0.25)" stroke-width="1.5"/>
+
+  <!-- ══════════════════════════════════════════ -->
+  <!--  TRAVELLING DATA PACKETS                   -->
+  <!-- ══════════════════════════════════════════ -->
+
+  <!-- Packet 1→2 -->
+  <g>
+    <circle r="6" fill="#EA6A47" filter="url(#glow-soft)" opacity="0">
+      <animateMotion dur="0.9s" begin="0.6s" repeatCount="indefinite">
+        <mpath href="#conn-1-2"/>
+      </animateMotion>
+      <animate attributeName="opacity" values="0;1;1;0" keyTimes="0;0.1;0.85;1" dur="0.9s" begin="0.6s" repeatCount="indefinite"/>
+    </circle>
+    <!-- trailing dot -->
+    <circle r="3" fill="#F5EFE0" opacity="0">
+      <animateMotion dur="0.9s" begin="0.65s" repeatCount="indefinite">
+        <mpath href="#conn-1-2"/>
+      </animateMotion>
+      <animate attributeName="opacity" values="0;0.6;0.6;0" keyTimes="0;0.1;0.85;1" dur="0.9s" begin="0.65s" repeatCount="indefinite"/>
+    </circle>
+  </g>
+
+  <!-- Packet 2→3 -->
+  <g>
+    <circle r="6" fill="#EA6A47" filter="url(#glow-soft)" opacity="0">
+      <animateMotion dur="0.9s" begin="1.6s" repeatCount="indefinite">
+        <mpath href="#conn-2-3"/>
+      </animateMotion>
+      <animate attributeName="opacity" values="0;1;1;0" keyTimes="0;0.1;0.85;1" dur="0.9s" begin="1.6s" repeatCount="indefinite"/>
+    </circle>
+    <circle r="3" fill="#F5EFE0" opacity="0">
+      <animateMotion dur="0.9s" begin="1.65s" repeatCount="indefinite">
+        <mpath href="#conn-2-3"/>
+      </animateMotion>
+      <animate attributeName="opacity" values="0;0.6;0.6;0" keyTimes="0;0.1;0.85;1" dur="0.9s" begin="1.65s" repeatCount="indefinite"/>
+    </circle>
+  </g>
+
+  <!-- Packet 3→4 -->
+  <g>
+    <circle r="6" fill="#EA6A47" filter="url(#glow-soft)" opacity="0">
+      <animateMotion dur="0.9s" begin="2.6s" repeatCount="indefinite">
+        <mpath href="#conn-3-4"/>
+      </animateMotion>
+      <animate attributeName="opacity" values="0;1;1;0" keyTimes="0;0.1;0.85;1" dur="0.9s" begin="2.6s" repeatCount="indefinite"/>
+    </circle>
+    <circle r="3" fill="#F5EFE0" opacity="0">
+      <animateMotion dur="0.9s" begin="2.65s" repeatCount="indefinite">
+        <mpath href="#conn-3-4"/>
+      </animateMotion>
+      <animate attributeName="opacity" values="0;0.6;0.6;0" keyTimes="0;0.1;0.85;1" dur="0.9s" begin="2.65s" repeatCount="indefinite"/>
+    </circle>
+  </g>
+
+  <!-- Packet 4→5 -->
+  <g>
+    <circle r="6" fill="#EA6A47" filter="url(#glow-soft)" opacity="0">
+      <animateMotion dur="0.9s" begin="3.6s" repeatCount="indefinite">
+        <mpath href="#conn-4-5"/>
+      </animateMotion>
+      <animate attributeName="opacity" values="0;1;1;0" keyTimes="0;0.1;0.85;1" dur="0.9s" begin="3.6s" repeatCount="indefinite"/>
+    </circle>
+    <circle r="3" fill="#F5EFE0" opacity="0">
+      <animateMotion dur="0.9s" begin="3.65s" repeatCount="indefinite">
+        <mpath href="#conn-4-5"/>
+      </animateMotion>
+      <animate attributeName="opacity" values="0;0.6;0.6;0" keyTimes="0;0.1;0.85;1" dur="0.9s" begin="3.65s" repeatCount="indefinite"/>
+    </circle>
+  </g>
+
+  <!-- ══════════════════════════════════════════ -->
+  <!--  NODE 1 — TRIGGER                          -->
+  <!-- centre: 110, 310                           -->
+  <!-- ══════════════════════════════════════════ -->
+  <g opacity="0" filter="url(#shadow)">
+    <animate attributeName="opacity" from="0" to="1" dur="0.45s" begin="0.3s" fill="freeze"/>
+    <!-- Node card -->
+    <rect x="48" y="248" width="124" height="124" rx="12" fill="#252542" stroke="rgba(234,106,71,0.55)" stroke-width="1.5"/>
+    <!-- Top accent bar -->
+    <rect x="48" y="248" width="124" height="4" rx="2" fill="#EA6A47"/>
+    <!-- Icon background circle -->
+    <circle cx="110" cy="295" r="24" fill="rgba(234,106,71,0.15)"/>
+    <!-- Lightning bolt icon (Trigger) -->
+    <polygon points="116,274 104,295 112,295 104,316 120,292 112,292 120,274" fill="#EA6A47" filter="url(#glow-soft)"/>
+    <!-- Node label -->
+    <text x="110" y="336" text-anchor="middle" fill="#F5EFE0" font-size="11" font-weight="600">TRIGGER</text>
+    <text x="110" y="351" text-anchor="middle" fill="rgba(245,239,224,0.42)" font-size="9">Schedule / Webhook</text>
+    <!-- Active pulse ring -->
+    <circle cx="110" cy="295" r="28" fill="none" stroke="#EA6A47" stroke-width="1.5" opacity="0">
+      <animate attributeName="r" values="26;40;26" dur="2.5s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="0.6;0;0.6" dur="2.5s" repeatCount="indefinite"/>
+    </circle>
+  </g>
+  <!-- Step label below node -->
+  <text x="110" y="398" text-anchor="middle" fill="rgba(234,106,71,0.7)" font-size="9" font-weight="600" letter-spacing="1.5" opacity="0">
+    STEP 1
+    <animate attributeName="opacity" from="0" to="1" dur="0.4s" begin="0.5s" fill="freeze"/>
+  </text>
+
+  <!-- ══════════════════════════════════════════ -->
+  <!--  NODE 2 — FILTER / IF                      -->
+  <!-- centre: 310, 310                           -->
+  <!-- ══════════════════════════════════════════ -->
+  <g opacity="0" filter="url(#shadow)">
+    <animate attributeName="opacity" from="0" to="1" dur="0.45s" begin="0.8s" fill="freeze"/>
+    <rect x="248" y="248" width="124" height="124" rx="12" fill="#252542" stroke="rgba(255,255,255,0.12)" stroke-width="1.5"/>
+    <rect x="248" y="248" width="124" height="4" rx="2" fill="#7c6af7"/>
+    <circle cx="310" cy="295" r="24" fill="rgba(124,106,247,0.15)"/>
+    <!-- Filter / IF icon (diamond) -->
+    <polygon points="310,272 330,295 310,318 290,295" fill="none" stroke="#7c6af7" stroke-width="2.5" filter="url(#glow-soft)"/>
+    <text x="310" y="300" text-anchor="middle" fill="#7c6af7" font-size="11" font-weight="700">IF</text>
+    <text x="310" y="336" text-anchor="middle" fill="#F5EFE0" font-size="11" font-weight="600">FILTER</text>
+    <text x="310" y="351" text-anchor="middle" fill="rgba(245,239,224,0.42)" font-size="9">Condition Check</text>
+    <!-- Pulse ring on activation -->
+    <circle cx="310" cy="295" r="28" fill="none" stroke="#7c6af7" stroke-width="1.5" opacity="0">
+      <animate attributeName="r" values="26;40;26" dur="2.5s" begin="1s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="0.5;0;0.5" dur="2.5s" begin="1s" repeatCount="indefinite"/>
+    </circle>
+  </g>
+  <text x="310" y="398" text-anchor="middle" fill="rgba(124,106,247,0.7)" font-size="9" font-weight="600" letter-spacing="1.5" opacity="0">
+    STEP 2
+    <animate attributeName="opacity" from="0" to="1" dur="0.4s" begin="1.0s" fill="freeze"/>
+  </text>
+
+  <!-- ══════════════════════════════════════════ -->
+  <!--  NODE 3 — DATA TRANSFORM                   -->
+  <!-- centre: 510, 310                           -->
+  <!-- ══════════════════════════════════════════ -->
+  <g opacity="0" filter="url(#shadow)">
+    <animate attributeName="opacity" from="0" to="1" dur="0.45s" begin="1.3s" fill="freeze"/>
+    <rect x="448" y="248" width="124" height="124" rx="12" fill="#252542" stroke="rgba(255,255,255,0.12)" stroke-width="1.5"/>
+    <rect x="448" y="248" width="124" height="4" rx="2" fill="#2da47e"/>
+    <circle cx="510" cy="295" r="24" fill="rgba(45,164,126,0.15)"/>
+    <!-- Transform / code icon (curly braces) -->
+    <text x="510" y="301" text-anchor="middle" fill="#2da47e" font-size="22" font-weight="700" filter="url(#glow-soft)">{}</text>
+    <text x="510" y="336" text-anchor="middle" fill="#F5EFE0" font-size="11" font-weight="600">TRANSFORM</text>
+    <text x="510" y="351" text-anchor="middle" fill="rgba(245,239,224,0.42)" font-size="9">Map &amp; Format Data</text>
+    <circle cx="510" cy="295" r="28" fill="none" stroke="#2da47e" stroke-width="1.5" opacity="0">
+      <animate attributeName="r" values="26;40;26" dur="2.5s" begin="2s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="0.5;0;0.5" dur="2.5s" begin="2s" repeatCount="indefinite"/>
+    </circle>
+  </g>
+  <text x="510" y="398" text-anchor="middle" fill="rgba(45,164,126,0.7)" font-size="9" font-weight="600" letter-spacing="1.5" opacity="0">
+    STEP 3
+    <animate attributeName="opacity" from="0" to="1" dur="0.4s" begin="1.5s" fill="freeze"/>
+  </text>
+
+  <!-- ══════════════════════════════════════════ -->
+  <!--  NODE 4 — TEMPLATE / COMPOSE               -->
+  <!-- centre: 710, 310                           -->
+  <!-- ══════════════════════════════════════════ -->
+  <g opacity="0" filter="url(#shadow)">
+    <animate attributeName="opacity" from="0" to="1" dur="0.45s" begin="1.8s" fill="freeze"/>
+    <rect x="648" y="248" width="124" height="124" rx="12" fill="#252542" stroke="rgba(255,255,255,0.12)" stroke-width="1.5"/>
+    <rect x="648" y="248" width="124" height="4" rx="2" fill="#e8a838"/>
+    <circle cx="710" cy="295" r="24" fill="rgba(232,168,56,0.15)"/>
+    <!-- Template / doc icon -->
+    <rect x="697" y="276" width="26" height="32" rx="3" fill="none" stroke="#e8a838" stroke-width="2" filter="url(#glow-soft)"/>
+    <line x1="701" y1="284" x2="719" y2="284" stroke="#e8a838" stroke-width="1.5"/>
+    <line x1="701" y1="290" x2="719" y2="290" stroke="#e8a838" stroke-width="1.5"/>
+    <line x1="701" y1="296" x2="712" y2="296" stroke="#e8a838" stroke-width="1.5"/>
+    <text x="710" y="336" text-anchor="middle" fill="#F5EFE0" font-size="11" font-weight="600">COMPOSE</text>
+    <text x="710" y="351" text-anchor="middle" fill="rgba(245,239,224,0.42)" font-size="9">Build Email Template</text>
+    <circle cx="710" cy="295" r="28" fill="none" stroke="#e8a838" stroke-width="1.5" opacity="0">
+      <animate attributeName="r" values="26;40;26" dur="2.5s" begin="3s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="0.5;0;0.5" dur="2.5s" begin="3s" repeatCount="indefinite"/>
+    </circle>
+  </g>
+  <text x="710" y="398" text-anchor="middle" fill="rgba(232,168,56,0.7)" font-size="9" font-weight="600" letter-spacing="1.5" opacity="0">
+    STEP 4
+    <animate attributeName="opacity" from="0" to="1" dur="0.4s" begin="2.0s" fill="freeze"/>
+  </text>
+
+  <!-- ══════════════════════════════════════════ -->
+  <!--  NODE 5 — SEND EMAIL                       -->
+  <!-- centre: 910, 310                           -->
+  <!-- ══════════════════════════════════════════ -->
+  <g opacity="0" filter="url(#shadow)">
+    <animate attributeName="opacity" from="0" to="1" dur="0.45s" begin="2.3s" fill="freeze"/>
+    <rect x="848" y="248" width="124" height="124" rx="12" fill="#252542" stroke="rgba(234,106,71,0.55)" stroke-width="1.5"/>
+    <rect x="848" y="248" width="124" height="4" rx="2" fill="#EA6A47"/>
+    <circle cx="910" cy="295" r="24" fill="rgba(234,106,71,0.15)"/>
+    <!-- Email / send icon -->
+    <polygon points="888,282 932,295 888,308 894,295" fill="none" stroke="#EA6A47" stroke-width="2" filter="url(#glow-soft)"/>
+    <line x1="894" y1="295" x2="888" y2="295" stroke="#EA6A47" stroke-width="2"/>
+    <!-- Envelope shape -->
+    <rect x="890" y="283" width="22" height="16" rx="2" fill="none" stroke="#EA6A47" stroke-width="1.8" filter="url(#glow-soft)"/>
+    <polyline points="890,283 901,292 912,283" fill="none" stroke="#EA6A47" stroke-width="1.5"/>
+    <text x="910" y="336" text-anchor="middle" fill="#F5EFE0" font-size="11" font-weight="600">SEND EMAIL</text>
+    <text x="910" y="351" text-anchor="middle" fill="rgba(245,239,224,0.42)" font-size="9">Gmail / SMTP</text>
+    <!-- Final celebration pulse -->
+    <circle cx="910" cy="295" r="28" fill="none" stroke="#EA6A47" stroke-width="2" opacity="0">
+      <animate attributeName="r" values="26;44;26" dur="2s" begin="4s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="0.7;0;0.7" dur="2s" begin="4s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="910" cy="295" r="38" fill="none" stroke="#EA6A47" stroke-width="1" opacity="0">
+      <animate attributeName="r" values="32;52;32" dur="2s" begin="4.2s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="0.3;0;0.3" dur="2s" begin="4.2s" repeatCount="indefinite"/>
+    </circle>
+  </g>
+  <text x="910" y="398" text-anchor="middle" fill="rgba(234,106,71,0.7)" font-size="9" font-weight="600" letter-spacing="1.5" opacity="0">
+    STEP 5
+    <animate attributeName="opacity" from="0" to="1" dur="0.4s" begin="2.5s" fill="freeze"/>
+  </text>
+
+  <!-- ══════════════════════════════════════════ -->
+  <!--  EXECUTION STATUS BAR                      -->
+  <!-- ══════════════════════════════════════════ -->
+  <g opacity="0">
+    <animate attributeName="opacity" from="0" to="1" dur="0.5s" begin="2.8s" fill="freeze"/>
+    <!-- Status bar background -->
+    <rect x="280" y="430" width="540" height="36" rx="8" fill="rgba(37,37,66,0.9)" stroke="rgba(255,255,255,0.08)" stroke-width="1"/>
+    <!-- Green dot: active -->
+    <circle cx="302" cy="448" r="5" fill="#2da47e"/>
+    <circle cx="302" cy="448" r="5" fill="#2da47e" opacity="0">
+      <animate attributeName="r" values="5;10;5" dur="2s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="0.5;0;0.5" dur="2s" repeatCount="indefinite"/>
+    </circle>
+    <text x="316" y="452" fill="rgba(245,239,224,0.7)" font-size="10" font-weight="500">Workflow Active</text>
+    <!-- Divider -->
+    <line x1="430" y1="436" x2="430" y2="460" stroke="rgba(255,255,255,0.1)" stroke-width="1"/>
+    <!-- Execution time -->
+    <text x="448" y="444" fill="rgba(245,239,224,0.4)" font-size="9">Avg execution</text>
+    <text x="448" y="457" fill="#e8a838" font-size="10" font-weight="600">1.2s</text>
+    <!-- Divider -->
+    <line x1="530" y1="436" x2="530" y2="460" stroke="rgba(255,255,255,0.1)" stroke-width="1"/>
+    <!-- Emails sent -->
+    <text x="548" y="444" fill="rgba(245,239,224,0.4)" font-size="9">Emails sent today</text>
+    <text x="548" y="457" fill="#EA6A47" font-size="10" font-weight="600">847</text>
+    <!-- Divider -->
+    <line x1="630" y1="436" x2="630" y2="460" stroke="rgba(255,255,255,0.1)" stroke-width="1"/>
+    <!-- Success rate -->
+    <text x="648" y="444" fill="rgba(245,239,224,0.4)" font-size="9">Success rate</text>
+    <text x="648" y="457" fill="#2da47e" font-size="10" font-weight="600">99.4%</text>
+    <!-- Divider -->
+    <line x1="720" y1="436" x2="720" y2="460" stroke="rgba(255,255,255,0.1)" stroke-width="1"/>
+    <!-- Errors -->
+    <text x="738" y="444" fill="rgba(245,239,224,0.4)" font-size="9">Errors</text>
+    <text x="738" y="457" fill="rgba(245,239,224,0.55)" font-size="10" font-weight="600">5</text>
+  </g>
+
+  <!-- ══════════════════════════════════════════ -->
+  <!--  NODE DESCRIPTION TOOLTIPS (bottom)        -->
+  <!-- ══════════════════════════════════════════ -->
+  <!-- Trigger description -->
+  <g opacity="0">
+    <animate attributeName="opacity" from="0" to="1" dur="0.5s" begin="3.2s" fill="freeze"/>
+    <text x="110" y="490" text-anchor="middle" fill="rgba(245,239,224,0.28)" font-size="8.5" font-style="italic">Runs every 5 min</text>
+    <text x="310" y="490" text-anchor="middle" fill="rgba(245,239,224,0.28)" font-size="8.5" font-style="italic">Is valid record?</text>
+    <text x="510" y="490" text-anchor="middle" fill="rgba(245,239,224,0.28)" font-size="8.5" font-style="italic">Merge + clean fields</text>
+    <text x="710" y="490" text-anchor="middle" fill="rgba(245,239,224,0.28)" font-size="8.5" font-style="italic">Personalise HTML</text>
+    <text x="910" y="490" text-anchor="middle" fill="rgba(245,239,224,0.28)" font-size="8.5" font-style="italic">Dispatch via API</text>
+  </g>
+
+  <!-- ══════════════════════════════════════════ -->
+  <!--  n8n CANVAS LABEL (bottom right)           -->
+  <!-- ══════════════════════════════════════════ -->
+  <g opacity="0">
+    <animate attributeName="opacity" from="0" to="1" dur="0.5s" begin="3.5s" fill="freeze"/>
+    <rect x="940" y="560" width="130" height="28" rx="6" fill="rgba(37,37,66,0.8)" stroke="rgba(255,255,255,0.07)" stroke-width="1"/>
+    <circle cx="956" cy="574" r="5" fill="#EA6A47"/>
+    <text x="966" y="578" fill="rgba(245,239,224,0.5)" font-size="9.5" font-weight="600">Built with n8n</text>
+  </g>
+
+  <!-- ══════════════════════════════════════════ -->
+  <!--  FLOATING PARTICLES (ambient)              -->
+  <!-- ══════════════════════════════════════════ -->
+  <circle r="1.5" fill="#EA6A47" opacity="0">
+    <animateMotion dur="7s" repeatCount="indefinite">
+      <mpath href="#conn-1-2"/>
+    </animateMotion>
+    <animate attributeName="opacity" values="0;0.4;0" dur="7s" repeatCount="indefinite"/>
+  </circle>
+  <circle r="1.5" fill="#7c6af7" opacity="0">
+    <animateMotion dur="7s" begin="1.4s" repeatCount="indefinite">
+      <mpath href="#conn-2-3"/>
+    </animateMotion>
+    <animate attributeName="opacity" values="0;0.4;0" dur="7s" begin="1.4s" repeatCount="indefinite"/>
+  </circle>
+  <circle r="1.5" fill="#2da47e" opacity="0">
+    <animateMotion dur="7s" begin="2.8s" repeatCount="indefinite">
+      <mpath href="#conn-3-4"/>
+    </animateMotion>
+    <animate attributeName="opacity" values="0;0.4;0" dur="7s" begin="2.8s" repeatCount="indefinite"/>
+  </circle>
+  <circle r="1.5" fill="#e8a838" opacity="0">
+    <animateMotion dur="7s" begin="4.2s" repeatCount="indefinite">
+      <mpath href="#conn-4-5"/>
+    </animateMotion>
+    <animate attributeName="opacity" values="0;0.4;0" dur="7s" begin="4.2s" repeatCount="indefinite"/>
+  </circle>
+
+</svg>
+</body>
+</html>
