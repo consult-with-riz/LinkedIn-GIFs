@@ -18,4 +18,6 @@ https://consult-with-riz.github.io/LinkedIn-GIFs/LinkedIn-Posting.html
 
 https://consult-with-riz.github.io/LinkedIn-GIFs/Upwork-n8n.html
 
-https://consult-with-riz.github.io/LinkedIn-GIFs/sales-lead-pipeline.html
+https://consult-with-riz.github.io/LinkedIn-GIFs/sales-lead-pipeline1.html
+
+https://consult-with-riz.github.io/LinkedIn-GIFs/sales-lead-pipeline2.html
