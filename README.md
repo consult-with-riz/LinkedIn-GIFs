@@ -17,3 +17,5 @@ https://consult-with-riz.github.io/LinkedIn-GIFs/LI-Content-Pipeline.html
 https://consult-with-riz.github.io/LinkedIn-GIFs/LinkedIn-Posting.html
 
 https://consult-with-riz.github.io/LinkedIn-GIFs/Upwork-n8n.html
+
+https://consult-with-riz.github.io/LinkedIn-GIFs/sales-lead-pipeline.html
